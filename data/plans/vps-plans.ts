@@ -40,6 +40,7 @@ export const vpsPlans: Plan[] = [
     price: 15.99,
     category: "VPS",
     location: "Germany",
+    popular: true,
     specs: {
       ram: "8GB",
       cpu: "2VCPU (AMD Ryzen 9 7950x3D)",

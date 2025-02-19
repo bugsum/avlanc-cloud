@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import {
   Bitcoin,
   CheckCircle,
-  Cloud,
   Cpu,
   CreditCard,
   DollarSign,
@@ -28,23 +27,26 @@ const hostingServices = [
     title: "Web Hosting",
     description: "Perfect for websites and applications",
     features: ["Unlimited Bandwidth", "Free SSL", "24/7 Support"],
-    price: "$5.99",
+    price: "$0.69",
     icon: Globe,
+    href: "/store?category=Web+Hosting",
   },
   {
     title: "VPS Hosting",
     description: "Full control and dedicated resources",
     features: ["Root Access", "SSD Storage", "Instant Scaling"],
-    price: "$19.99",
+    price: "$9.99",
     icon: Server,
     popular: true,
+    href: "/store?category=VPS",
   },
   {
-    title: "Dedicated Servers",
+    title: "Game Servers",
     description: "Maximum performance and security",
     features: ["Enterprise Hardware", "DDoS Protection", "24/7 Support"],
-    price: "$99.99",
-    icon: Cloud,
+    price: "$3.50",
+    icon: Cpu,
+    href: "/store?category=Minecraft",
   },
 ];
 
@@ -139,7 +141,7 @@ export default function Home() {
                     <span className="text-muted-foreground ml-2">/month</span>
                   </div>
                   <Button className="w-full " asChild>
-                    <Link href="/store">Get Started</Link>
+                    <Link href={service.href}>Get Started</Link>
                   </Button>
                 </div>
               ))}
@@ -155,7 +157,7 @@ export default function Home() {
 
         <section className="py-24 bg-background">
           <div className="container px-4">
-            <div className="rounded-lg border bg-gradient-to-r from-blue-900/10 via-blue-900/20 to-blue-900/10 p-12 text-center shadow-lg">
+            <div className="rounded-lg border bg-gradient-to-r from-accent/10 via-accent/20 to-accent/10 p-12 text-center shadow-lg">
               <Badge className="mb-4">Get Started</Badge>
               <h2 className="text-4xl font-bold mb-4">Ready to Get Started?</h2>
               <p className="text-muted-foreground max-w-2xl mx-auto mb-8">

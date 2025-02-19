@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { discordPlans } from "@/data";
 import { minecraftPlans } from "@/data";
 import { vpsPlans } from "@/data";
-import { dedicatedPlans } from "@/data";
+// import { dedicatedPlans } from "@/data";
 import { Plan } from "@/types";
 import { webPlans } from "@/data/plans/web-plans";
 // import { useTheme } from "next-themes";
@@ -61,7 +61,10 @@ export function ProductGrid() {
             <ul className="space-y-2 mb-4">
               {Object.entries(plan.specs).map(([key, value]) => (
                 <li key={key} className="flex items-center text-sm">
-                  <span className="w-20 font-medium">{key.charAt(0).toUpperCase() + key.slice(1)}</span> {value}
+                  <span className="w-20 font-medium">
+                    {key.charAt(0).toUpperCase() + key.slice(1)}
+                  </span>{" "}
+                  {value}
                 </li>
               ))}
             </ul>

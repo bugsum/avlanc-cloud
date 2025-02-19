@@ -3,7 +3,7 @@ import { Plan } from "@/types";
 export const minecraftPlans: Plan[] = [
   {
     title: "Minecraft Budget (Dirt Plan)",
-    price: 3.50,
+    price: 3.5,
     category: "Minecraft",
     location: "Germany",
     specs: {
@@ -23,7 +23,7 @@ export const minecraftPlans: Plan[] = [
   },
   {
     title: "Minecraft Budget (Dirt Plan)",
-    price: 4.00,
+    price: 4.0,
     category: "Minecraft",
     location: "India",
     specs: {
@@ -43,9 +43,10 @@ export const minecraftPlans: Plan[] = [
   },
   {
     title: "Minecraft Premium (Dirt Plan)",
-    price: 5.20,
+    price: 5.2,
     category: "Minecraft",
     location: "Germany",
+    popular: true,
     specs: {
       ram: "2GB",
       cpu: "100% (AMD Ryzen 9 7950x3D)",
@@ -65,7 +66,7 @@ export const minecraftPlans: Plan[] = [
   },
   {
     title: "Minecraft Premium (Dirt Plan)",
-    price: 4.00,
+    price: 4.0,
     category: "Minecraft",
     location: "India",
     specs: {
