@@ -61,7 +61,7 @@ export const Header = () => {
 
             <HeaderNavigationMobile
               logo={{
-                src: "/avlanc.png",
+                src: "/avlanc-transparent.png",
                 alt: "Avlanc Logo",
               }}
               sections={headerNavigationMobileSections}
