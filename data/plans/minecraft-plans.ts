@@ -1,0 +1,88 @@
+import { Plan } from "@/types";
+
+export const minecraftPlans: Plan[] = [
+  {
+    title: "Minecraft Budget (Dirt Plan)",
+    price: 3.50,
+    category: "Minecraft",
+    location: "Germany",
+    specs: {
+      ram: "2GB",
+      cpu: "100% (Intel Core I9-9900k)",
+      disk: "25GB SSD",
+      backup: "2x",
+      port: "2x",
+      database: "2x",
+    },
+    features: [
+      "One-Click Installs",
+      "DDoS Protection",
+      "24/7 Support",
+      "Mod Support",
+    ],
+  },
+  {
+    title: "Minecraft Budget (Dirt Plan)",
+    price: 4.00,
+    category: "Minecraft",
+    location: "India",
+    specs: {
+      ram: "2GB",
+      cpu: "100% (AMD EPYC 7452)",
+      disk: "25GB SSD",
+      backup: "2x",
+      port: "2x",
+      database: "2x",
+    },
+    features: [
+      "One-Click Installs",
+      "DDoS Protection",
+      "24/7 Support",
+      "Mod Support",
+    ],
+  },
+  {
+    title: "Minecraft Premium (Dirt Plan)",
+    price: 5.20,
+    category: "Minecraft",
+    location: "Germany",
+    specs: {
+      ram: "2GB",
+      cpu: "100% (AMD Ryzen 9 7950x3D)",
+      disk: "25GB SSD",
+      backup: "2x",
+      port: "2x",
+      database: "2x",
+    },
+    features: [
+      "One-Click Installs",
+      "DDoS Protection",
+      "24/7 Priority Support",
+      "Mod Support",
+      "Daily Backups",
+      "Custom Domain",
+    ],
+  },
+  {
+    title: "Minecraft Premium (Dirt Plan)",
+    price: 4.00,
+    category: "Minecraft",
+    location: "India",
+    specs: {
+      ram: "2GB",
+      cpu: "100% (AMD Ryzen 7 5800x)",
+      disk: "25GB SSD",
+      backup: "2x",
+      port: "2x",
+      database: "2x",
+    },
+    features: [
+      "One-Click Installs",
+      "DDoS Protection",
+      "24/7 Priority Support",
+      "Mod Support",
+      "Daily Backups",
+      "Custom Domain",
+    ],
+  },
+];
