@@ -38,7 +38,7 @@ export const HeaderNavigationMobile = ({
             {logo && (
               <Image src={logo.src} alt={logo.alt} width={24} height={24} />
             )}
-            <span className="font-bold">ElightNodes</span>
+            <span className="font-bold">Avlanc Cloud</span>
           </Link>
 
           <SheetClose className="rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">

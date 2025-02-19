@@ -61,7 +61,7 @@ export const Header = () => {
 
             <HeaderNavigationMobile
               logo={{
-                src: "/logo.webp",
+                src: "/logo.png",
                 alt: "ElightNodes Logo",
               }}
               sections={headerNavigationMobileSections}
