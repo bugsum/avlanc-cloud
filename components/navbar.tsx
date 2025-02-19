@@ -56,7 +56,7 @@ export function Navbar() {
         <Link href={"/"} className="flex items-center space-x-2">
           <Image
             src={"/avlanc-transparent.png"}
-            alt="ElightNodes Logo"
+            alt="Avlanc Logo"
             width={32}
             height={32}
           />

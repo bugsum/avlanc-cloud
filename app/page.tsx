@@ -161,8 +161,8 @@ export default function Home() {
               <Badge className="mb-4">Get Started</Badge>
               <h2 className="text-4xl font-bold mb-4">Ready to Get Started?</h2>
               <p className="text-muted-foreground max-w-2xl mx-auto mb-8">
-                Join our satisfied customers who trust ElightNodes for their
-                hosting needs
+                Join our satisfied customers who trust Avlanc for their hosting
+                needs
               </p>
               <div className="flex flex-col sm:flex-row justify-center gap-4">
                 <Button size="lg" asChild>

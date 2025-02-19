@@ -52,8 +52,8 @@ export function Footer() {
             <div className="flex items-center space-x-2">
               <Image
                 src={"/avlanc-transparent.png"}
-                alt="ElightNodes Logo"
-                className="h-8 w-8 bg-foreground dark:bg-transparent rounded-sm"
+                alt="Avlanc Logo"
+                className="h-8 w-8 bg-foreground rounded-sm"
                 width={64}
                 height={64}
               />

@@ -30,7 +30,7 @@ export const Header = () => {
           <Link href={"/"} className="flex items-center space-x-2">
             <Image
               src={"/avlanc-transparent.png"}
-              alt="ElightNodes Logo"
+              alt="Avlanc Logo"
               className="h-8 w-8 bg-foreground dark:bg-transparent rounded-full"
               width={64}
               height={64}
@@ -61,8 +61,8 @@ export const Header = () => {
 
             <HeaderNavigationMobile
               logo={{
-                src: "/logo.png",
-                alt: "ElightNodes Logo",
+                src: "/avlanc.png",
+                alt: "Avlanc Logo",
               }}
               sections={headerNavigationMobileSections}
               actions={{
