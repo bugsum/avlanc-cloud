@@ -17,7 +17,6 @@ export default function StorePage() {
           message="This Store is currently under development, You will soon be able to purchase anything!"
           variant="default"
           classname="rounded-md"
-          link={{ text: "Learn More", href: "" }}
         />
       </div>
       <div className="flex flex-col md:flex-row gap-8">

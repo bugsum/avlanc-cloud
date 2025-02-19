@@ -22,15 +22,9 @@ const resources = [
 ];
 
 const socialIcons = [
-  { icon: FaDiscord, title: "Discord",
-    href:"https://discord.gg/AzD5kWSxQ9",
-   },
-  { icon: FaGithub, title: "Github",
-    href:"",
-   },
-  { icon: FaInstagram, title: "Instagram", 
-    href:"",
-  },
+  { icon: FaDiscord, title: "Discord", href: "https://discord.gg/AzD5kWSxQ9" },
+  { icon: FaGithub, title: "Github", href: "" },
+  { icon: FaInstagram, title: "Instagram", href: "" },
 ];
 
 const legal = [
@@ -77,7 +71,9 @@ export function Footer() {
                   size="icon"
                   className="hover:text-blue-500"
                 >
-                  <icons.icon className="h-4 w-4" />
+                  <Link href={icons.href} target="_blank">
+                    <icons.icon className="h-4 w-4" />
+                  </Link>
                 </Button>
               ))}
             </div>
