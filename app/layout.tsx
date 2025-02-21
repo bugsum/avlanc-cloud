@@ -42,6 +42,9 @@ export const metadata: Metadata = {
     locale: "en",
   },
   robots: { index: true, follow: true },
+  other: {
+    "google-adsense-account": "ca-pub-2187816601788737",
+  },
 };
 export default function RootLayout({
   children,
