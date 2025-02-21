@@ -53,7 +53,7 @@ export function Footer() {
               <Image
                 src={"/avlanc-transparent.png"}
                 alt="Avlanc Logo"
-                className="h-8 w-8 bg-foreground rounded-sm"
+                className="h-8 w-8 bg-transparent rounded-sm"
                 width={64}
                 height={64}
               />

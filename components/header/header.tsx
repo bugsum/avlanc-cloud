@@ -31,7 +31,7 @@ export const Header = () => {
             <Image
               src={"/avlanc-transparent.png"}
               alt="Avlanc Logo"
-              className="h-8 w-8 bg-foreground dark:bg-transparent rounded-full"
+              className="h-8 w-8 bg-transparent rounded-full"
               width={64}
               height={64}
             />
