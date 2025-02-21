@@ -29,6 +29,9 @@ export const metadata: Metadata = {
     "Avlanc Cloud",
     "Avlanc Corp",
     "Avlanc",
+    "avlanc",
+    "avlanc cloud",
+    "free hosting",
   ],
   openGraph: {
     type: "website",
