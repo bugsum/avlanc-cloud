@@ -32,6 +32,7 @@ export const metadata: Metadata = {
     "avlanc",
     "avlanc cloud",
     "free hosting",
+    "free",
   ],
   openGraph: {
     type: "website",
