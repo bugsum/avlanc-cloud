@@ -24,12 +24,12 @@ const paymentMethods = [
 
 const hostingServices = [
   {
-    title: "Web Hosting",
-    description: "Perfect for websites and applications",
-    features: ["Unlimited Bandwidth", "Free SSL", "24/7 Support"],
-    price: "$0.69",
+    title: "Dedicated Servers",
+    description: "Perfect for heavy servers",
+    features: ["Unlimited Bandwidth", "Hardware Access", "24/7 Support"],
+    price: "$99.99",
     icon: Globe,
-    href: "/store?category=Web+Hosting",
+    href: "/store?category=Dedicated+Servers",
   },
   {
     title: "VPS Hosting",
@@ -90,8 +90,8 @@ export default function Home() {
           }}
           // cards={features}
           badge={{
-            text: "Use code Avlanc2025 for a 30% Discount!",
-            copyText: "Avlanc2025",
+            text: "Use code INDIA50 for 50% off",
+            copyText: "INDIA50",
             variant: "warning",
           }}
         />

@@ -125,6 +125,7 @@ export interface Plan {
   features: string[];
   popular?: boolean; // optional property
   location?: string; // optional property
+  href?: string,
 }
 
 /* -------------------------------------------------------------------------- */

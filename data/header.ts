@@ -23,9 +23,9 @@ export const headerNavigationItems: HeaderNavigationItems[] = [
     },
     items: [
       {
-        title: "Web Hosting",
-        description: "The best web hosting solutions for the best web designs.",
-        href: "/store?category=Web+Hosting",
+        title: "Dedicated Servers",
+        description: "Best for big industrial or business needs.",
+        href: "/store?category=Dedicated+Servers",
       },
       {
         title: "VPS Hosting",

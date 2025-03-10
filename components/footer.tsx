@@ -19,12 +19,20 @@ const resources = [
     title: "Store",
     href: "/store",
   },
+  {
+    title: "Status Page",
+    href: "https://status.avlanc.com/",
+  },
+  {
+    title: "Trustpilot Reviews",
+    href: "https://www.trustpilot.com/review/avlanc.com",
+  },
 ];
 
 const socialIcons = [
-  { icon: FaDiscord, title: "Discord", href: "https://discord.gg/AzD5kWSxQ9" },
+  { icon: FaDiscord, title: "Discord", href: "https://discord.gg/gpEBVVDbTJ" },
   { icon: FaGithub, title: "Github", href: "" },
-  { icon: FaInstagram, title: "Instagram", href: "" },
+  { icon: FaInstagram, title: "Instagram", href: "https://www.instagram.com/avlancloud?igsh=bzN1bHZ6Nmwycjcz" },
 ];
 
 const legal = [

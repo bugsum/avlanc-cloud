@@ -6,6 +6,7 @@ export const discordPlans: Plan[] = [
     title: "Standard Plan",
     price: 1.00, // Assuming this is in Indian Rupees
     category: "Discord Bots",
+    href: "https://billing.avlanc.com/index.php?rp=/store/discord-bots/standard-plan",
     specs: {
       ram: "1GB",
       cpu: "100%",
@@ -26,6 +27,8 @@ export const discordPlans: Plan[] = [
     title: "Premium Plan",
     price: 2.00, // Assuming this is in Indian Rupees
     category: "Discord Bots",
+    popular: true,
+    href: "https://billing.avlanc.com/index.php?rp=/store/discord-bots/premium-plan",
     specs: {
       ram: "2GB",
       cpu: "150%",
@@ -46,6 +49,7 @@ export const discordPlans: Plan[] = [
     title: "Ultimate Plan",
     price: 3.00, // Assuming this is in Indian Rupees
     category: "Discord Bots",
+    href: "https://billing.avlanc.com/index.php?rp=/store/discord-bots/ultimate-plan",
     specs: {
       ram: "3GB",
       cpu: "200%",

@@ -14,7 +14,7 @@ export default function StorePage() {
       />
       <div className="py-4">
         <Announcement
-          message="This Store is currently under development, You will soon be able to purchase anything!"
+          message="You can directly visit our store at https://billing.avlanc.com/"
           variant="default"
           classname="rounded-md"
         />

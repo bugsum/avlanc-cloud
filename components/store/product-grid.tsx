@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 
 import { useSearchParams } from "next/navigation";
 import {
@@ -10,7 +11,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { discordPlans } from "@/data";
+import { dedicatedPlans, discordPlans } from "@/data";
 import { minecraftPlans } from "@/data";
 import { vpsPlans } from "@/data";
 // import { dedicatedPlans } from "@/data";
@@ -19,10 +20,12 @@ import { webPlans } from "@/data/plans/web-plans";
 // import { useTheme } from "next-themes";
 
 const allPlans: Plan[] = [
+  ...webPlans,
   ...discordPlans,
   ...minecraftPlans,
   ...vpsPlans,
-  ...webPlans,
+  ...dedicatedPlans,
+  
 ];
 
 export function ProductGrid() {
@@ -75,15 +78,35 @@ export function ProductGrid() {
                 </li>
               ))}
             </ul>
-            {plan.features.length > 3 && (
+            {plan.features.length > 4 && (
               <p className="text-sm text-muted-foreground mt-1">
                 + {plan.features.length - 3} more features
               </p>
             )}
           </CardContent>
           <CardFooter>
-            <Button className="w-full">Select Plan</Button>
+            {plan?.href ? (
+              // <Link
+              //   href={plan.href}
+              //   target="_blank"
+              //   className="w-full h-9 px-4 py-2 bg-primary text-primary-foreground shadow hover:bg-primary/90 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"
+              // >
+              //   Select Plan
+              // </Link>
+
+              <Link href={plan?.href} target="_blank" className="w-full">
+                <Button className="w-full">Select Plan</Button>
+              </Link>
+            ) : (
+              <Link href={"#"} className="w-full">
+                <Button className="w-full" variant={"secondary"}>
+                  Coming Soon
+                </Button>
+              </Link>
+            )}
+            {/* <Button className="w-full">Select Plan</Button> */}
           </CardFooter>
+
         </Card>
       ))}
     </div>
