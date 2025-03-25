@@ -4,9 +4,10 @@ import "./globals.css";
 import { Footer } from "@/components/footer";
 import { cn } from "@/lib/utils";
 import { Header } from "@/components/header/header";
-import { Announcement } from "@/components/ui/announcement";
+// import { Announcement } from "@/components/ui/announcement";
 import { ChatWidget } from "@/components/chat-widget";
 import { ubuntu } from "@/lib/fonts";
+import { Banner2 } from "@/components/Banner";
 
 // const inter = Inter({ subsets: ["latin"] });
 
@@ -69,11 +70,17 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <Announcement
+          <Banner2
+            title="Stability is here!"
+            description="Avlanc's first stable release is here."
+            buttonText="Get Started"
+            buttonUrl="/"
+          />
+          {/* <Announcement
             message="The website is still under beta version. 🚀"
             variant="warning"
             // link={{ text: "Learn More", href: "https://avlanc.com" }}
-          />
+          /> */}
           <ChatWidget />
           <Header />
           {children}
