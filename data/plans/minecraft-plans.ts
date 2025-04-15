@@ -6,7 +6,6 @@ export const minecraftPlans: Plan[] = [
     price: 2.00,
     category: "Minecraft",
     location: "Germany",
-    href: "https://billing.avlanc.com/index.php?rp=/store/minecraft-budget-ger/dirt",
     specs: {
       ram: "2GB",
       cpu: "100% (Intel Core I7-8700k)",
@@ -27,7 +26,6 @@ export const minecraftPlans: Plan[] = [
     price: 2.50,
     category: "Minecraft",
     location: "India",
-    href: "https://billing.avlanc.com/index.php?rp=/store/minecraft-budget-india/dirt-plan-in",
     specs: {
       ram: "2GB",
       cpu: "100% (AMD EPYC 7452)",
@@ -48,7 +46,6 @@ export const minecraftPlans: Plan[] = [
     price: 4.00,
     category: "Minecraft",
     location: "Germany",
-    href: "https://billing.avlanc.com/index.php?rp=/store/minecraft-premium-ger/dirt-plan-2",
     popular: true,
     specs: {
       ram: "2GB",

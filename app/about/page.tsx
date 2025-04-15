@@ -158,28 +158,33 @@ export default function AboutPage() {
       </section>
 
       {/* Join Us Section */}
-      <section className="py-12 md:py-24">
-        <div className="container px-4 md:px-6">
-          <div className="flex flex-col items-center space-y-4 text-center">
-            <div className="space-y-2">
-              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">
-                Join Our Growing Team
-              </h2>
-              <p className="mx-auto max-w-[700px] text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed dark:text-gray-400">
-                Be part of our mission to revolutionize cloud hosting.
-                We&apos;re always looking for talented individuals to join our
-                team.
-              </p>
-            </div>
-            <div className="flex flex-col gap-2 min-[400px]:flex-row">
-              <Button className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-8 text-sm font-medium text-primary-foreground">
-                View Open Positions
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
+<section className="py-12 md:py-24">
+  <div className="container px-4 md:px-6">
+    <div className="flex flex-col items-center space-y-4 text-center">
+      <div className="space-y-2">
+        <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">
+          Join Our Growing Team
+        </h2>
+        <p className="mx-auto max-w-[700px] text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed dark:text-gray-400">
+          Be part of our mission to revolutionize cloud hosting.
+          We&apos;re always looking for talented individuals to join our
+          team.
+        </p>
+      </div>
+      <div className="flex flex-col gap-2 min-[400px]:flex-row">
+        <a
+          href="https://docs.google.com/forms/d/e/1FAIpQLScVtjmJ-S-YaxsYuug4mLKAybKzAVbSbeLXfzfaXkl2T6CPRA/viewform?usp=sf_link"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-8 text-sm font-medium text-primary-foreground"
+        >
+          View Open Positions
+          <ArrowRight className="ml-2 h-4 w-4" />
+        </a>
+      </div>
     </div>
+  </div>
+</section>
+</div>
   );
 }

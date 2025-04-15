@@ -1,7 +1,7 @@
 export const legalContent = {
   "terms-of-service": {
     title: "Terms of Service",
-    lastUpdated: "February 1, 2024",
+    lastUpdated: "April 15, 2025",
     content: `
 By using the services of **Avlanc**, you ("the User", "Client", "Customer") agree to abide by the following Terms of Service. These terms govern the use of all our services provided by Avlanc. Please read these Terms carefully before using our services.
 
@@ -10,7 +10,7 @@ By using the services of **Avlanc**, you ("the User", "Client", "Customer") agre
 ## 1. REFUNDS
 
 - All payments made are eligible for a refund within **48 hours** of the original payment date. However, you may contact Avlanc within **7 days** of the original payment via our billing portal to request a refund in the form of credits to your Avlanc account.
-- Payments follow the 48-hour refund policy regardless of the service billing cycle. **Dedicated Machines** are final purchases and are **not eligible for refunds**. Avlanc will not negotiate any alternative form of return for these services. Any refund request will be denied.
+- Payments follow the 48-hour refund policy regardless of the service billing cycle. **Dedicated services, Virtual Dedicated Servers, and Virtual Private Servers** are final purchases and are **not eligible for refunds**. Avlanc will not negotiate any alternative form of return for these services. Any refund request will be denied.
 - Refunds will only include the paid amount after deducting the tax fees imposed by the payment gateway.
 - **Overcharges** are refundable only within the first month of the charge; after this period, overcharges will be classified as a normal payment.
 - **Add-ons** are **non-refundable**.
@@ -122,25 +122,34 @@ Avlanc support will not assist with:
 
 ## 9. CANCELLATION POLICY
 
-The cancellation of services is subject to the following:
-
-- You can cancel your services at any time, but the payment for the current billing cycle is non-refundable once processed.
-- For any requests to cancel or terminate services, please contact us through our billing portal or support system.
-- Cancellations will not affect any pre-existing charges, and all credits or payments made are subject to the terms outlined in this document.
-
-By using Avlanc’ services, you acknowledge that you have read, understood, and agreed to these Terms of Service.
+- You may cancel your service at any time, but payments for the current billing cycle are non-refundable once processed.
+- Any cancellation request or plan change must be made at least 10 business days before the end of your billing period.
+- If no prior notice is given, your subscription will automatically renew for the next billing cycle.
+- Failure to pay the next billing cycle on time may result in suspension of all services under your account without prior notice.
+- All service cancellations must be submitted via the billing portal or official support system.
 
 ---
 
 ## 10. BACKUP POLICY
 
-Avlanc services are provided at the **User's own risk.** The User is responsible for ensuring that their data is backed up and accessible when required. Avlanc does not guarantee the backup of any account or user content and is not liable for data loss.
+Avlanc services are provided at the **User's own risk.** The User is responsible for ensuring that their data is backed up and accessible when required. 
+Unless **automatic backup systems** are **explicitly purchased** from Avlanc, **backups are not guaranteed** and should not be relied upon. It is the User's responsibility to ensure that backups are active and functioning, and to maintain offsite copies of important data when needed.
 
-        `,
+---
+
+## 11. PUBLIC DEFAMATION AND MISINFORMATION
+
+- Users are expected to express criticism or dissatisfaction with Avlanc through appropriate and constructive channels such as support tickets or official feedback forms.
+- Publicly defaming Avlanc (including but not limited to false accusations, unverified claims, or misleading statements) on any platform — including Discord, social media, or forums — without sufficient evidence may result in **account suspension or service termination**.
+- This clause is not intended to infringe on free speech but to protect Avlanc from deliberate misinformation or damage to its reputation.
+- Users found in violation of this clause will first be warned with the opportunity to provide evidence or retract false claims. Continued violations may lead to permanent bans from Avlanc services.
+- This clause is subject to all applicable laws, including those governing defamation and freedom of expression under Indian and international jurisdiction.
+
+    `,
   },
   "privacy-policy": {
     title: "Privacy Policy",
-    lastUpdated: "March 1, 2024",
+    lastUpdated: "April 15, 2025",
     content: `
 At **Avlanc** ("we", "our", "us"), your privacy is of utmost importance to us. This Privacy Policy outlines how we collect, use, and protect your personal information when you visit our website, register for our services, or engage with us in other ways. It applies to **all of our services**.
 
@@ -266,9 +275,9 @@ By using our services, you acknowledge that you have read and understood this Pr
     `,
   },
   "service-level-agreement": {
-    title: "Service Level Agreement",
-    lastUpdated: "February 1, 2024",
-    content: `
+  title: "Service Level Agreement",
+  lastUpdated: "April 22 , 2025",
+  content: `
 This Service Level Agreement (SLA) outlines the terms and conditions for services provided by **Avlanc** ("we", "us", "our"). This document defines the service standards, responsibilities, and guarantees to ensure a high-quality experience for our customers.  
 
 ___
@@ -278,21 +287,24 @@ ___
 - **Service Credit:** A credit, calculated as a percentage of the monthly service fee, provided to the customer when the service does not meet the uptime guarantees specified in this SLA.  
 - **Scheduled Maintenance:** Planned maintenance activities communicated to customers at least 24 hours in advance.  
 - **Urgent Maintenance:** Maintenance conducted to address critical issues such as security patching or preventing damage to infrastructure or customers, which may not allow for advance notice.  
+- **External Network Issue:** Any issue caused by upstream providers or the public internet, which is outside Avlanc's direct control and not considered downtime.  
 
 ___
 ## **2. Services Covered**  
 
-This SLA applies to the following services provided by **Avlanc**:  
+This SLA applies to all services offered by **Avlanc**, including but not limited to:  
 
 - **Minecraft Hosting**  
 - **Virtual Private Server (VPS) Hosting**  
 - **Discord Bot Hosting**  
 - **Dedicated Server Hosting**  
 
+This SLA applies across all Avlanc products, even if not explicitly listed above.  
+
 ___
 ## **3. Uptime Guarantee**  
 
-We guarantee that our services will be available **99.9%** of the time in any given calendar month, excluding scheduled maintenance and urgent maintenance.  
+We guarantee that our services will be available **99.9%** of the time in any given calendar month, excluding scheduled maintenance, urgent maintenance, and external network issues.  
 
 ___
 ## **4. Service Credits**  
@@ -309,7 +321,9 @@ If the uptime falls below the guaranteed level, customers will be eligible for s
 | 3 days downtime   | 50% of monthly fee |
 | 1 week downtime   | 75% of monthly fee |
 
-**Maximum Credit:** The total service credit for any given month shall not exceed **75% of the monthly service fee**.  
+- **Maximum Credit:** The total service credit for any given month shall not exceed **75% of the monthly service fee**.  
+- **Non-Cash Credit:** Service credits are issued only as billing credits for future invoices and are not redeemable for cash or transferable.  
+- **Non-Cumulative:** Service credits do not accumulate across billing cycles or apply to multiple services simultaneously.  
 
 ___
 ## **5. Customer Responsibilities**  
@@ -317,6 +331,7 @@ ___
 - Customers must report service outages or interruptions within **24 hours** as they occur.  
 - Customers must provide accurate and timely information to facilitate the resolution of service issues.  
 - Customers must ensure their use of the service complies with our **Acceptable Use Policy**.  
+- Customers are encouraged to provide **third-party uptime monitoring data** (e.g., UptimeRobot or BetterUptime) when submitting claims.  
 
 ___
 ## **6. Exclusions**  
@@ -325,40 +340,42 @@ Service credits will not be provided for downtime or interruptions resulting fro
 
 - Scheduled maintenance  
 - Urgent maintenance (e.g., security patching or preventing infrastructure damage)  
-- Customer’s actions or inactions  
-- Issues with customer’s equipment or third-party services  
+- External network issues or failures of upstream providers  
+- Customer’s actions or misconfigurations  
+- Failures or limitations on the customer’s end (hardware/software issues)  
 - Force majeure events such as natural disasters, war, or acts of God  
-- Services paid with no monetary value (e.g., free plans)  
-- Indirect downtimes that do not affect the customer’s server (e.g., website downtime)  
+- Services provided at no cost (e.g., free trials or promo plans)  
+- Indirect outages that do not impact server accessibility (e.g., website downtime)  
 
 ___
 ## **7. Claims Process**  
 
-To request a service credit, customers must submit a claim within **24 Hours** of the downtime event. The claim must include:  
+To request a service credit, customers must submit a claim within **24 hours** of the downtime event. The claim must include:  
 
 1. **Customer’s account information**  
 2. **Date and time of the downtime**  
 3. **Duration of the downtime with proof**  
-4. **Any relevant logs or documentation**  
+4. **Any relevant logs or documentation (e.g., screenshots or monitoring links)**  
 
-Claims should be submitted through our **billing panel**.  
+Claims must be submitted via the **billing panel**. Incomplete or unverifiable claims will be denied.  
 
 ___
 ## **8. Scheduled Maintenance**  
 
 - **Notification:** Customers will be notified of scheduled maintenance at least **24 hours** in advance.  
 - **Duration:** Maintenance windows will typically last no longer than **4 hours** and will be scheduled during off-peak hours.  
+- Service credits are not issued for scheduled maintenance periods.  
 
 ___
 ## **9. Limitations of Liability**  
 
-- **Avlanc’s liability is limited** to the total amount the customer has paid for the service during the month in which the service failure occurred.  
+- **Avlanc’s liability is limited** to the total amount the customer has paid for the affected service during the month in which the service failure occurred.  
 - **Service credits are the sole and exclusive remedy** for downtime or service interruptions.  
 
 ___
 ## **10. Termination**  
-
-This SLA remains in effect for the duration of the customer’s contract with **Avlanc**. We reserve the right to modify or terminate this SLA upon **seven (7) days' notice** to customers.  
+  
+We reserve the right to modify or terminate this SLA with **seven (7) days’ notice** to customers.  
 
 ___
 ## **11. Governing Law**  
@@ -367,7 +384,85 @@ This SLA will be governed by and construed in accordance with the **laws of Indi
 
 ___
 **By using the services provided by Avlanc, the customer acknowledges and agrees to the terms and conditions outlined in this SLA.**  
+    `
+},
+"acceptable-usage-policy": {
+  title: "Acceptable Usage Policy",
+  lastUpdated: "April 22, 2025",
+  content: `
+This Acceptable Usage Policy (AUP) outlines the rules and guidelines for using the services provided by **Avlanc** ("we", "us", "our"). By using our services, you agree to comply with this AUP. Failure to adhere to this policy may result in suspension or termination of your account or services.
 
-        `,
-  },
+This policy applies to **all services provided by Avlanc**, including but not limited to Minecraft hosting, Virtual Dedicated Servers (VDS), web hosting, and other infrastructure solutions.
+
+---
+
+## **1. Prohibited Activities**
+
+You may not use our services to engage in any of the following activities:
+
+### **a. Illegal Activities**
+- Hosting, distributing, or promoting content that violates any applicable laws or regulations.
+- Engaging in fraud, identity theft, or other unlawful activities.
+
+### **b. Harmful or Malicious Activities**
+- Distributing malware, viruses, or other harmful software.
+- Launching Distributed Denial of Service (DDoS) attacks or any other form of cyberattack.
+- Attempting to gain unauthorized access to systems, networks, or accounts.
+
+### **c. Inappropriate Content**
+- Hosting or distributing content that is obscene, defamatory, hateful, or discriminatory.
+- Promoting violence, harassment, or abuse of any kind.
+
+### **d. Resource Abuse**
+- Overloading servers or systems with excessive resource usage, including CPU, memory, or bandwidth.
+- Running resource-intensive applications without prior approval.
+
+### **e. Spamming**
+- Sending unsolicited bulk emails or messages.
+- Engaging in phishing or other deceptive practices.
+
+---
+
+## **2. Security and Integrity**
+
+You are responsible for maintaining the security of your account and services. This includes:
+- Using strong passwords and enabling two-factor authentication (2FA) where available.
+- Keeping your software, plugins, and scripts up to date to prevent vulnerabilities.
+- Reporting any security breaches or vulnerabilities to Avlanc immediately.
+
+---
+
+## **3. Fair Usage**
+
+To ensure a high-quality experience for all users, you must adhere to the following fair usage guidelines:
+- Do not use services in a manner that negatively impacts other users.
+- Avoid excessive or unreasonable use of resources beyond what is allocated in your plan.
+- **Fair usage applies even to services with dedicated resource allocations (such as Virtual Dedicated Servers).** Excessive load, abuse of I/O, or intentional resource overutilization may still result in warnings, throttling, or suspension at Avlanc’s discretion to protect infrastructure health.
+
+---
+
+## **4. Enforcement**
+
+Avlanc reserves the right to take appropriate action if you violate this AUP, including but not limited to:
+- Issuing warnings or notices.
+- Suspending or terminating your account or services.
+- Reporting illegal activities to law enforcement authorities.
+
+---
+
+## **5. Reporting Violations**
+
+If you become aware of any violations of this AUP, please report them to us at **[owner@avlanc.com](mailto:owner@avlanc.com)**. Provide as much detail as possible to assist us in investigating the issue.
+
+---
+
+## **6. Amendments**
+
+We may update this AUP from time to time to reflect changes in our services or legal requirements. Updates will be posted on our website, and continued use of our services constitutes acceptance of the revised policy.
+
+---
+
+By using our services, you acknowledge that you have read, understood, and agreed to this Acceptable Usage Policy.
+`
+},
 };

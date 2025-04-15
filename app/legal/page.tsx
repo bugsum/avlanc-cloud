@@ -29,7 +29,14 @@ const policies = [
     icon: Scale,
     description: "Our commitments to service availability and performance",
     lastUpdated: "February 18th, 2025",
-  },
+  }, 
+  {
+    title: "Acceptable Usage Policy",
+    slug: "acceptable-usage-policy",
+    icon: Scale,
+    description: "Our guidelines for acceptable use of Avlanc Services",
+    lastUpdated: "February 18th, 2025",
+  }, 
 ];
 
 export default function LegalPage() {

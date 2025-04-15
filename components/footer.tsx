@@ -48,6 +48,10 @@ const legal = [
     title: "Service Level Agreement",
     href: "/legal/service-level-agreement",
   },
+  {
+    title: "Acceptable Usage Policy",
+    href: "/legal/acceptable-usage-policy",
+  },
 ];
 
 export function Footer() {

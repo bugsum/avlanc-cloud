@@ -100,7 +100,7 @@ export function ProductGrid() {
             ) : (
               <Link href={"#"} className="w-full">
                 <Button className="w-full" variant={"secondary"}>
-                  Coming Soon
+                  Out Of Stock
                 </Button>
               </Link>
             )}
