@@ -275,9 +275,9 @@ By using our services, you acknowledge that you have read and understood this Pr
     `,
   },
   "service-level-agreement": {
-  title: "Service Level Agreement",
-  lastUpdated: "April 22 , 2025",
-  content: `
+    title: "Service Level Agreement",
+    lastUpdated: "April 15 , 2025",
+    content: `
 This Service Level Agreement (SLA) outlines the terms and conditions for services provided by **Avlanc** ("we", "us", "our"). This document defines the service standards, responsibilities, and guarantees to ensure a high-quality experience for our customers.  
 
 ___
@@ -384,12 +384,12 @@ This SLA will be governed by and construed in accordance with the **laws of Indi
 
 ___
 **By using the services provided by Avlanc, the customer acknowledges and agrees to the terms and conditions outlined in this SLA.**  
-    `
-},
-"acceptable-usage-policy": {
-  title: "Acceptable Usage Policy",
-  lastUpdated: "April 22, 2025",
-  content: `
+    `,
+  },
+  "acceptable-usage-policy": {
+    title: "Acceptable Usage Policy",
+    lastUpdated: "April 22, 2025",
+    content: `
 This Acceptable Usage Policy (AUP) outlines the rules and guidelines for using the services provided by **Avlanc** ("we", "us", "our"). By using our services, you agree to comply with this AUP. Failure to adhere to this policy may result in suspension or termination of your account or services.
 
 This policy applies to **all services provided by Avlanc**, including but not limited to Minecraft hosting, Virtual Dedicated Servers (VDS), web hosting, and other infrastructure solutions.
@@ -463,6 +463,6 @@ We may update this AUP from time to time to reflect changes in our services or l
 ---
 
 By using our services, you acknowledge that you have read, understood, and agreed to this Acceptable Usage Policy.
-`
-},
+`,
+  },
 };
