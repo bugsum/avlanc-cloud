@@ -31,8 +31,12 @@ const resources = [
 
 const socialIcons = [
   { icon: FaDiscord, title: "Discord", href: "https://discord.gg/N7CQBZhs" },
-  { icon: FaGithub, title: "Github", href: "" },
-  { icon: FaInstagram, title: "Instagram", href: "https://www.instagram.com/avlancloud?igsh=bzN1bHZ6Nmwycjcz" },
+  { icon: FaGithub, title: "Github", href: "https://github.com" },
+  {
+    icon: FaInstagram,
+    title: "Instagram",
+    href: "https://www.instagram.com/avlancloud?igsh=bzN1bHZ6Nmwycjcz",
+  },
 ];
 
 const legal = [
