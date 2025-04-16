@@ -7,7 +7,11 @@ export function generateStaticParams() {
   }));
 }
 
-export default function PolicyPage({ params }: { params: { policy: string } }) {
-  const policy = legalContent[params.policy as keyof typeof legalContent];
+type Params = Promise<{ policy: string }>;
+
+export default async function PolicyPage({ params }: { params: Params }) {
+  const legal = await params;
+  const policy = legalContent[legal.policy as keyof typeof legalContent];
+
   return <LegalPolicy policy={policy} />;
 }
