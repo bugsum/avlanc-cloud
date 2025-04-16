@@ -375,7 +375,7 @@ ___
 ___
 ## **10. Termination**  
   
-We reserve the right to modify or terminate this SLA with **seven (7) days’ notice** to customers.  
+We reserve the right to modify or terminate this SLA with **seven (7) days notice** to customers.  
 
 ___
 ## **11. Governing Law**  
