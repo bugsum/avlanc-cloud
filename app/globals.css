@@ -8,53 +8,55 @@ body {
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --ring: 221.2 83.2% 53.3%;
-    --chart-1: 12 76% 61%;
+    /* Colors */
+    --background: 0 0% 100%; /* White for background */
+    --foreground: 221.2 83.2% 53.3%; /* Deep Blue for main text */
+    --muted: 210 40% 96.1%; /* Light Sky Blue for muted elements */
+    --muted-foreground: 215.4 16.3% 46.9%; /* Dark Navy for muted text */
+    --popover: 0 0% 100%; /* White for popover background */
+    --popover-foreground: 222.2 84% 4.9%; /* Deep Blue for popover text */
+    --card: 0 0% 100%; /* White for card background */
+    --card-foreground: 222.2 84% 4.9%; /* Deep Blue for card text */
+    --border: 214.3 31.8% 91.4%; /* Light Silver for border */
+    --input: 214.3 31.8% 91.4%; /* Light Silver for input background */
+    --primary: 221.2 83.2% 53.3%; /* Deep Blue as primary color */
+    --primary-foreground: 210 40% 98%; /* White for primary text */
+    --secondary: 210 40% 96.1%; /* Sky Blue for secondary elements */
+    --secondary-foreground: 222.2 47.4% 11.2%; /* Dark Navy for secondary text */
+    --accent: 210 40% 96.1%; /* Light Sky Blue for accents */
+    --accent-foreground: 222.2 47.4% 11.2%; /* Dark Navy for accent text */
+    --destructive: 0 84.2% 60.2%; /* Red for destructive actions */
+    --destructive-foreground: 210 40% 98%; /* White for destructive text */
+    --ring: 221.2 83.2% 53.3%; /* Deep Blue for ring */
+    --chart-1: 12 76% 61%; /* Custom chart colors */
     --chart-2: 173 58% 39%;
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
-    --radius: 0.5rem;
+    --radius: 0.5rem; /* Standard radius for rounded corners */
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --ring: 224.3 76.3% 48%;
+    /* Dark mode styling */
+    --background: 222.2 84% 4.9%; /* Dark background */
+    --foreground: 210 40% 98%; /* Light text for dark mode */
+    --muted: 217.2 32.6% 17.5%; /* Dark muted color */
+    --muted-foreground: 215 20.2% 65.1%; /* Muted text in dark mode */
+    --popover: 222.2 84% 4.9%; /* Dark popover background */
+    --popover-foreground: 210 40% 98%; /* Light popover text */
+    --card: 222.2 84% 4.9%; /* Dark card background */
+    --card-foreground: 210 40% 98%; /* Light card text */
+    --border: 217.2 32.6% 17.5%; /* Dark border */
+    --input: 217.2 32.6% 17.5%; /* Dark input background */
+    --primary: 217.2 91.2% 59.8%; /* Light Blue for primary in dark mode */
+    --primary-foreground: 222.2 47.4% 11.2%; /* Dark text for primary */
+    --secondary: 217.2 32.6% 17.5%; /* Dark secondary color */
+    --secondary-foreground: 210 40% 98%; /* Light secondary text */
+    --accent: 217.2 32.6% 17.5%; /* Dark accent color */
+    --accent-foreground: 210 40% 98%; /* Light accent text */
+    --destructive: 0 62.8% 30.6%; /* Red for destructive actions in dark mode */
+    --destructive-foreground: 210 40% 98%; /* White for destructive text */
+    --ring: 224.3 76.3% 48%; /* Blue ring color */
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
@@ -111,4 +113,34 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: hsl(217.2, 91.2%, 59.8%);
+}
+
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.gradient {
+  --size: 750px;
+  --speed: 50s;
+  --easing: cubic-bezier(0.8, 0.2, 0.2, 0.8);
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  width: var(--size);
+  height: var(--size);
+  filter: blur(calc(var(--size) / 5));
+  background-image: linear-gradient(hsl(222, 84, 60, 100%), hsl(164, 79, 71));
+  animation: rotate var(--speed) var(--easing) alternate infinite;
+  border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+}
+
+@media (min-width: 720px) {
+  .gradient {
+    --size: 500px;
+  }
 }

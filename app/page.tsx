@@ -54,6 +54,7 @@ export default function Home() {
   return (
     <main className="min-h-screen">
       <div className="relative">
+        {/* <div className="gradient" /> */}
         <Hero
           cards={[
             {

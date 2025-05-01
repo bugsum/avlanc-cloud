@@ -60,7 +60,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body
         className={cn(
-          "min-h-screen bg-background antialiased",
+          "min-h-screen bg-background antialiased relative",
           ubuntu.className
         )}
       >
@@ -70,12 +70,32 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <Banner2
+          {/* <div
+            className={cn(
+              "absolute inset-0 overflow-hidden pointer-events-none"
+            )}
+            style={{ zIndex: "-10" }}
+          >
+            <div
+              className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 aspect-square rounded-full"
+              style={{
+                width: "30%",
+                background: `radial-gradient(circle, ${[
+                  "#ff007a",
+                  "#00e0ff",
+                  "#7928ca",
+                ].join(", ")})`,
+                filter: `blur(120px)`,
+                opacity: "0.15",
+              }}
+            />
+          </div> */}
+          {/* <Banner2
             title="Stability is here!"
             description="Avlanc's first stable release is here."
             buttonText="Get Started"
             buttonUrl="/"
-          />
+          /> */}
           {/* <Announcement
             message="The website is still under beta version. 🚀"
             variant="warning"

@@ -30,8 +30,8 @@ const resources = [
 ];
 
 const socialIcons = [
-  { icon: FaDiscord, title: "Discord", href: "https://discord.gg/N7CQBZhs" },
-  { icon: FaGithub, title: "Github", href: "https://github.com" },
+  { icon: FaDiscord, title: "Discord", href: "https://discord.avlanc.com" },
+  { icon: FaGithub, title: "Github", href: "https://github.com/Avlanc" },
   {
     icon: FaInstagram,
     title: "Instagram",
