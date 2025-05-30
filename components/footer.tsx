@@ -41,20 +41,8 @@ const socialIcons = [
 
 const legal = [
   {
-    title: "Privacy Policy",
-    href: "/legal/privacy-policy",
-  },
-  {
-    title: "Terms of Service",
-    href: "/legal/terms-of-service",
-  },
-  {
-    title: "Service Level Agreement",
-    href: "/legal/service-level-agreement",
-  },
-  {
-    title: "Acceptable Usage Policy",
-    href: "/legal/acceptable-usage-policy",
+    title: "Our Policies",
+    href: "/policies",
   },
 ];
 
