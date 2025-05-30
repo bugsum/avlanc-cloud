@@ -8,7 +8,7 @@ import { useCart } from "@/lib/cart-context";
 import { useEffect, useState } from "react";
 
 export default function CheckoutPage() {
-  const { cartItems } = useCart();
+  const { cartItems, removeFromCart } = useCart();
   const [totalAmount, setTotalAmount] = useState(0);
   
   const [formData, setFormData] = useState({
