@@ -110,22 +110,16 @@ export interface HeroProps {
 /* -------------------------------------------------------------------------- */
 
 export interface Plan {
+    id: string;
     title: string;
     price: number;
     category: string;
-    // specs: {
-    //   ram: string;
-    //   cpu: string;
-    //   disk?: string;
-    //   backup?: string;
-    //   port?: string;
-    //   database?: string;
-    //   storage?: string;
-    // };
+    description: string;
     features: string[];
     popular?: boolean; // optional property
     location?: string; // optional property
     href?: string;
+    image?: string; // optional property for product image URL
 }
 
 /* -------------------------------------------------------------------------- */

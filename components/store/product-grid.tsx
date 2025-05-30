@@ -2,17 +2,13 @@
 import Link from "next/link";
 
 import { useSearchParams } from "next/navigation";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useCart } from "@/lib/cart-context";
+import { useRouter } from "next/navigation";
 // import { dedicatedPlans } from "@/data";
-import { Plan } from "@/types";
+import { Plan } from "@/types/interfaces";
 import { appDevPlans } from "@/data/plans/app-dev";
 import { webDevPlans } from "@/data/plans/web-dev";
 // import { useTheme } from "next-themes";
@@ -31,6 +27,8 @@ export function ProductGrid() {
   const searchParams = useSearchParams();
   const category = searchParams.get("category");
   const searchQuery = searchParams.get("q");
+  const { addToCart } = useCart();
+  const router = useRouter();
   //   const { theme } = useTheme();
 
   const filteredPlans = allPlans.filter(
@@ -45,31 +43,15 @@ export function ProductGrid() {
       {filteredPlans.map((plan, index) => (
         <Card key={index} className="flex flex-col">
           <CardHeader>
-            <CardTitle className="flex justify-between items-center">
-              {plan.title}
+            <div className="flex justify-between items-center">
+              <h3 className="text-xl font-semibold">{plan.title}</h3>
               {plan.popular && <Badge variant="secondary">Popular</Badge>}
-            </CardTitle>
+            </div>
             <p className="text-sm text-muted-foreground">
               {plan.category} {plan.location && `- ${plan.location}`}
             </p>
           </CardHeader>
           <CardContent className="flex-grow">
-            <p className="text-2xl font-bold mb-4">
-              ₹{plan.price.toFixed(2)}
-              <span className="text-lg font-normal text-muted-foreground">
-                /mo
-              </span>
-            </p>
-            {/* <ul className="space-y-2 mb-4">
-              {Object.entries(plan.specs).map(([key, value]) => (
-                <li key={key} className="flex items-center text-sm">
-                  <span className="w-20 font-medium">
-                    {key.charAt(0).toUpperCase() + key.slice(1)}
-                  </span>{" "}
-                  {value}
-                </li>
-              ))}
-            </ul> */}
             <ul className="space-y-1">
               {plan.features.slice(0, 3).map((feature, index) => (
                 <li key={index} className="text-sm text-muted-foreground">
@@ -83,19 +65,54 @@ export function ProductGrid() {
               </p>
             )}
           </CardContent>
+          <CardContent>
+            <div className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                {plan.description}
+              </p>
+              <div className="flex items-center justify-start">
+                <span className="text-2xl font-bold">₹{plan.price}</span>/mo
+                
+              </div>
+            </div>
+          </CardContent>
           <CardFooter>
             {plan?.href ? (
-              // <Link
-              //   href={plan.href}
-              //   target="_blank"
-              //   className="w-full h-9 px-4 py-2 bg-primary text-primary-foreground shadow hover:bg-primary/90 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"
-              // >
               //   Select Plan
               // </Link>
 
-              <Link href={plan?.href} target="_blank" className="w-full">
-                <Button className="w-full">Select Plan</Button>
-              </Link>
+              // <Link href={plan?.href} target="_blank" className="w-full">
+                <Button
+                  onClick={async (e) => {
+                    e.preventDefault();
+                    try {
+                      // Create cart item with all required fields
+                      const cartItem = {
+                        id: plan.id,
+                        name: plan.title,
+                        price: plan.price,
+                        quantity: 1,
+                        image: plan.image || '',
+                        category: plan.category,
+                        description: plan.description,
+                        features: plan.features
+                      };
+                      
+                      // Add to cart and wait for it to complete
+                      await addToCart(cartItem);
+                      
+                      // Only redirect after successful add to cart
+                      router.push('/checkout');
+                    } catch (error) {
+                      console.error('Error adding to cart:', error);
+                      // You might want to show a toast notification here
+                    }
+                  }}
+                  className="w-full"
+                >
+                  Select Plan
+                </Button>
+              // </Link>
             ) : (
               <Link href={"#"} className="w-full">
                 <Button className="w-full" variant={"secondary"}>

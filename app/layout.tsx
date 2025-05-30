@@ -7,6 +7,7 @@ import { Header } from "@/components/header/header";
 // import { Announcement } from "@/components/ui/announcement";
 import { ChatWidget } from "@/components/chat-widget";
 import { ubuntu } from "@/lib/fonts";
+import { CartProvider } from "@/lib/cart-context";
 
 // const inter = Inter({ subsets: ["latin"] });
 
@@ -61,7 +62,8 @@ export default function RootLayout({
         className={cn(
           "min-h-screen bg-background antialiased relative",
           ubuntu.className
-        )} suppressHydrationWarning
+        )}
+        suppressHydrationWarning
       >
         <ThemeProvider
           attribute="class"
@@ -69,41 +71,14 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {/* <div
-            className={cn(
-              "absolute inset-0 overflow-hidden pointer-events-none"
-            )}
-            style={{ zIndex: "-10" }}
-          >
-            <div
-              className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 aspect-square rounded-full"
-              style={{
-                width: "30%",
-                background: `radial-gradient(circle, ${[
-                  "#ff007a",
-                  "#00e0ff",
-                  "#7928ca",
-                ].join(", ")})`,
-                filter: `blur(120px)`,
-                opacity: "0.15",
-              }}
-            />
-          </div> */}
-          {/* <Banner2
-            title="Stability is here!"
-            description="Avlanc's first stable release is here."
-            buttonText="Get Started"
-            buttonUrl="/"
-          /> */}
-          {/* <Announcement
-            message="The website is still under beta version. 🚀"
-            variant="warning"
-            // link={{ text: "Learn More", href: "https://avlanc.com" }}
-          /> */}
-          <ChatWidget />
-          <Header />
-          {children}
-          <Footer />
+          <CartProvider>
+            <Header />
+            <main className="flex min-h-screen flex-col">
+              {children}
+            </main>
+            <ChatWidget />
+            <Footer />
+          </CartProvider>
         </ThemeProvider>
       </body>
     </html>

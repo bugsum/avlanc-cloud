@@ -2,14 +2,11 @@ import { Plan } from '@/types';
 
 export const appDevPlans: Plan[] = [
     {
+        id: 'app-dev-basic',
         title: 'Basic Mobile App',
         price: 4999,
         category: 'App Development',
-        // specs: {
-        //     ram: 'N/A',
-        //     cpu: 'N/A',
-        //     storage: '500 MB',
-        // },
+        description: 'A basic mobile app with essential features',
         features: [
             'Simple UI',
             'Basic Features',
@@ -18,14 +15,11 @@ export const appDevPlans: Plan[] = [
         href: '/store/app-dev/basic',
     },
     {
+        id: 'app-dev-mvp',
         title: 'MVP Mobile App',
         price: 8999,
         category: 'App Development',
-        // specs: {
-        //     ram: 'N/A',
-        //     cpu: 'N/A',
-        //     storage: '1 GB',
-        // },
+        description: 'A minimum viable product mobile app with essential features',
         features: [
             'Cross-Platform (React Native)',
             'User Auth',
@@ -35,15 +29,11 @@ export const appDevPlans: Plan[] = [
         href: '/store/app-dev/mvp',
     },
     {
+        id: 'app-dev-standard',
         title: 'Standard Mobile App',
         price: 14999,
         category: 'App Development',
-        // specs: {
-        //     ram: 'N/A',
-        //     cpu: 'N/A',
-        //     storage: '2 GB',
-        //     backup: 'Weekly',
-        // },
+        description: 'A standard mobile app with advanced features',
         features: [
             'Cross-Platform',
             'Push Notifications',
@@ -53,15 +43,11 @@ export const appDevPlans: Plan[] = [
         href: '/store/app-dev/standard',
     },
     {
+        id: 'app-dev-fullstack',
         title: 'Full-Stack App',
         price: 22999,
         category: 'App Development',
-        // specs: {
-        //     ram: 'N/A',
-        //     cpu: 'N/A',
-        //     storage: '5 GB',
-        //     backup: 'Weekly',
-        // },
+        description: 'A comprehensive full-stack mobile app solution',
         features: [
             'iOS & Android',
             'Admin Dashboard',
@@ -72,15 +58,11 @@ export const appDevPlans: Plan[] = [
         href: '/store/app-dev/fullstack',
     },
     {
+        id: 'app-dev-enterprise',
         title: 'Enterprise App',
         price: 49999,
         category: 'App Development',
-        // specs: {
-        //     ram: 'N/A',
-        //     cpu: 'N/A',
-        //     storage: 'Unlimited',
-        //     backup: 'Daily',
-        // },
+        description: 'Enterprise-grade mobile application solution',
         features: [
             'Custom Architecture',
             'CI/CD Pipeline',
