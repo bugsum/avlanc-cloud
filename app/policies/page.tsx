@@ -151,6 +151,8 @@ export default function PoliciesPage() {
                     <p className="text-muted-foreground">
                       Once development work has begun, no refund will be provided under any circumstance.
                     </p>
+
+                    <p className="text-muted-foreground">Refund will be credited to the original payment method within 5-7 business days</p>
                   </div>
 
                   {/* No Refund Scenarios */}
