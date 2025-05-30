@@ -89,22 +89,22 @@ export const appDevPlans: Plan[] = [
         ],
         href: '/store/app-dev/enterprise',
     },
-    {
-        title: 'Custom App Development',
-        price: 0, // custom quote
-        category: 'App Development',
-        // specs: {
-        //     ram: 'Custom',
-        //     cpu: 'Custom',
-        //     storage: 'Custom',
-        //     backup: 'Custom',
-        // },
-        features: [
-            'Tailored to Your Business Needs',
-            'Flexible Technologies',
-            'Dedicated Team',
-            'Ongoing Support',
-        ],
-        href: '/contact/custom-app-dev',
-    },
+    // {
+    //     title: 'Custom App Development',
+    //     price: 0, // custom quote
+    //     category: 'App Development',
+    //     // specs: {
+    //     //     ram: 'Custom',
+    //     //     cpu: 'Custom',
+    //     //     storage: 'Custom',
+    //     //     backup: 'Custom',
+    //     // },
+    //     features: [
+    //         'Tailored to Your Business Needs',
+    //         'Flexible Technologies',
+    //         'Dedicated Team',
+    //         'Ongoing Support',
+    //     ],
+    //     href: '/contact/custom-app-dev',
+    // },
 ];

@@ -37,10 +37,10 @@ const developmentServices = [
     href: "/services/app-web-development",
   },
   {
-    title: "E-Commerce Integration",
+    title: "E-Commerce Development",
     description: "Launch or upgrade your online store with flexibility",
     features: [
-      "Payment Gateway Integration",
+      // "Payment Gateway Integration",
       "Secure Checkout",
       "CMS & Inventory Systems",
     ],
@@ -101,7 +101,7 @@ export default function Home() {
           ctaLink="/store"
           secondaryCTA={{
             text: "Learn More",
-            link: "/store#pricing",
+            link: "/about",
           }}
           // cards={features}
           badge={{

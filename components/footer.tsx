@@ -11,22 +11,22 @@ const resources = [
     title: "About Us",
     href: "/about",
   },
-  {
-    title: "Blogs",
-    href: "/blogs",
-  },
+  // {
+  //   title: "Blogs",
+  //   href: "/blogs",
+  // },
   {
     title: "Store",
     href: "/store",
   },
-  {
-    title: "Status Page",
-    href: "https://status.avlanc.com/",
-  },
-  {
-    title: "Trustpilot Reviews",
-    href: "https://www.trustpilot.com/review/avlanc.com",
-  },
+  // {
+  //   title: "Status Page",
+  //   href: "https://status.avlanc.com/",
+  // },
+  // {
+  //   title: "Trustpilot Reviews",
+  //   href: "https://www.trustpilot.com/review/avlanc.com",
+  // },
 ];
 
 const socialIcons = [

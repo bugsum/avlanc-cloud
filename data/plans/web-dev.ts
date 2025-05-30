@@ -86,7 +86,7 @@ export const webDevPlans: Plan[] = [
         //     storage: 'Unlimited',
         // },
         features: [
-            'Payment Gateway Integration',
+            // 'Payment Gateway Integration',
             'Shopping Cart',
             'Product Management',
             'User Authentication',

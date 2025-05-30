@@ -48,11 +48,11 @@ export const headerNavigationItems: HeaderNavigationItems[] = [
     //   triggerIcon: User,
     //   href: "/careers",
     // },
-    {
-        title: 'Blogs',
-        triggerIcon: Notebook,
-        href: '/blogs',
-    },
+    // {
+    //     title: 'Blogs',
+    //     triggerIcon: Notebook,
+    //     href: '/blogs',
+    // },
     {
         title: 'Store',
         triggerIcon: ShoppingCart,
