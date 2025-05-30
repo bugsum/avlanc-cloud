@@ -3,7 +3,7 @@ import { ProductGrid } from "@/components/store/product-grid";
 import { ProductSearch } from "@/components/store/product-search";
 import { CategoryFilter } from "@/components/store/category-filter";
 import { PageHeader } from "@/components/page-header";
-import { Announcement } from "@/components/ui/announcement";
+// import { Announcement } from "@/components/ui/announcement";
 
 export default function StorePage() {
   return (
@@ -12,13 +12,13 @@ export default function StorePage() {
         title="Avlanc Store"
         description="Find the perfect hosting solution for your needs"
       />
-      <div className="py-4">
+      {/* <div className="py-4">
         <Announcement
           message="You can directly visit our store at https://billing.avlanc.com/"
           variant="default"
           classname="rounded-md"
         />
-      </div>
+      </div> */}
       <div className="flex flex-col md:flex-row gap-8">
         <aside className="w-full md:w-64">
           <CategoryFilter />

@@ -5,11 +5,8 @@ import { Button } from "@/components/ui/button";
 
 const categories = [
   "All",
-  "Web Hosting",
-  "VPS",
-  "Minecraft",
-  "Discord Bots",
-  "Dedicated Servers"
+  "Web Development",
+  "App Development"
 ];
 
 export function CategoryFilter() {

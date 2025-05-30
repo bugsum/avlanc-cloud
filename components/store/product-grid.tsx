@@ -11,21 +11,20 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { dedicatedPlans, discordPlans } from "@/data";
-import { minecraftPlans } from "@/data";
-import { vpsPlans } from "@/data";
 // import { dedicatedPlans } from "@/data";
 import { Plan } from "@/types";
-import { webPlans } from "@/data/plans/web-plans";
+import { appDevPlans } from "@/data/plans/app-dev";
+import { webDevPlans } from "@/data/plans/web-dev";
 // import { useTheme } from "next-themes";
 
 const allPlans: Plan[] = [
-  ...webPlans,
-  ...discordPlans,
-  ...minecraftPlans,
-  ...vpsPlans,
-  ...dedicatedPlans,
-  
+  // ...webPlans,
+  // ...discordPlans,
+  // ...minecraftPlans,
+  // ...vpsPlans,
+  // ...dedicatedPlans,
+  ...appDevPlans,
+  ...webDevPlans
 ];
 
 export function ProductGrid() {
@@ -56,12 +55,12 @@ export function ProductGrid() {
           </CardHeader>
           <CardContent className="flex-grow">
             <p className="text-2xl font-bold mb-4">
-              ${plan.price.toFixed(2)}
+              ₹{plan.price.toFixed(2)}
               <span className="text-lg font-normal text-muted-foreground">
                 /mo
               </span>
             </p>
-            <ul className="space-y-2 mb-4">
+            {/* <ul className="space-y-2 mb-4">
               {Object.entries(plan.specs).map(([key, value]) => (
                 <li key={key} className="flex items-center text-sm">
                   <span className="w-20 font-medium">
@@ -70,7 +69,7 @@ export function ProductGrid() {
                   {value}
                 </li>
               ))}
-            </ul>
+            </ul> */}
             <ul className="space-y-1">
               {plan.features.slice(0, 3).map((feature, index) => (
                 <li key={index} className="text-sm text-muted-foreground">

@@ -76,8 +76,7 @@ export function Footer() {
               <span className="text-lg font-bold">Avlanc Cloud</span>
             </div>
             <p className="text-sm text-muted-foreground">
-              Empowering businesses with next-generation cloud solutions.
-              Experience the future of cloud computing with Avlanc.
+              Modern apps. Powerful websites. Built for the next generation.
             </p>
             <div className="flex space-x-4">
               {socialIcons.map((icons) => (

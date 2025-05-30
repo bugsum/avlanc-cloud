@@ -1,0 +1,116 @@
+import { Plan } from '@/types';
+
+export const webDevPlans: Plan[] = [
+    {
+        title: 'Basic Website',
+        price: 1499,
+        category: 'Web Development',
+        specs: {
+            ram: 'N/A',
+            cpu: 'N/A',
+            disk: 'N/A',
+            database: '1 Database',
+        },
+        features: [
+            'Responsive Design',
+            '3 Pages',
+            'Basic SEO Setup',
+            'Contact Form Integration',
+        ],
+        href: '/store/web-dev/basic',
+    },
+    {
+        title: 'Starter Website',
+        price: 2499,
+        category: 'Web Development',
+        specs: {
+            ram: 'N/A',
+            cpu: 'N/A',
+            disk: 'N/A',
+            database: '1 Database',
+        },
+        features: [
+            'Responsive Design',
+            '5 Pages',
+            'Basic SEO Setup',
+            'Contact Form Integration',
+        ],
+        href: '/store/web-dev/starter',
+    },
+    {
+        title: 'Professional Website',
+        price: 3999,
+        category: 'Web Development',
+        specs: {
+            ram: 'N/A',
+            cpu: 'N/A',
+            disk: 'N/A',
+            database: '3 Databases',
+        },
+        features: [
+            '10 Pages',
+            'Custom CMS Setup',
+            'SEO Optimization',
+            'Analytics Integration',
+        ],
+        href: '/store/web-dev/professional',
+    },
+    {
+        title: 'Business Website',
+        price: 6999,
+        category: 'Web Development',
+        specs: {
+            ram: 'N/A',
+            cpu: 'N/A',
+            disk: 'N/A',
+            database: 'Unlimited Databases',
+        },
+        features: [
+            '10+ Pages',
+            'Custom CMS Integration',
+            'Advanced SEO',
+            'Performance Optimization',
+        ],
+        popular: true,
+        href: '/store/web-dev/business',
+    },
+    {
+        title: 'E-Commerce Website',
+        price: 11999,
+        category: 'Web Development',
+        specs: {
+            ram: 'N/A',
+            cpu: 'N/A',
+            disk: 'N/A',
+            database: 'Unlimited',
+            storage: 'Unlimited',
+        },
+        features: [
+            'Payment Gateway Integration',
+            'Shopping Cart',
+            'Product Management',
+            'User Authentication',
+        ],
+        href: '/store/web-dev/ecommerce',
+    },
+    {
+        title: 'Enterprise Web Solution',
+        price: 24999,
+        category: 'Web Development',
+        specs: {
+            ram: 'N/A',
+            cpu: 'N/A',
+            disk: 'N/A',
+            database: 'Unlimited',
+            storage: 'Unlimited',
+            backup: 'Daily',
+        },
+        features: [
+            'Custom Architecture',
+            'High Traffic Optimization',
+            'Multi-region Deployment',
+            'Dedicated Support',
+        ],
+        href: '/store/web-dev/enterprise',
+    },
+];

@@ -5,48 +5,61 @@ import { Hero } from "@/components/hero";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  Bitcoin,
+  Banknote,
   CheckCircle,
+  Code,
   Cpu,
   CreditCard,
-  DollarSign,
-  Globe,
-  Server,
+  IndianRupee,
+  Rocket,
   Shield,
+  ShoppingCart,
 } from "lucide-react";
 import Link from "next/link";
 
 const paymentMethods = [
   { icon: CreditCard, label: "Credit Card" },
-  { icon: Bitcoin, label: "Cryptocurrency" },
-  { icon: DollarSign, label: "Bank Transfer" },
+  { icon: Banknote, label: "Bank Transfer" },
+  { icon: IndianRupee, label: "UPI" },
 ];
 
-const hostingServices = [
+const developmentServices = [
   {
-    title: "Dedicated Servers",
-    description: "Perfect for heavy servers",
-    features: ["Unlimited Bandwidth", "Hardware Access", "24/7 Support"],
-    price: "$99.99",
-    icon: Globe,
-    href: "/store?category=Dedicated+Servers",
+    title: "App & Web Development",
+    description: "Build scalable, high-performance apps and websites",
+    features: [
+      "Mobile & Web App Dev",
+      "Backend/API Systems",
+      "UI/UX Design",
+    ],
+    price: "Starting at ₹15,000",
+    icon: Code,
+    href: "/services/app-web-development",
   },
   {
-    title: "VPS Hosting",
-    description: "Full control and dedicated resources",
-    features: ["Root Access", "SSD Storage", "Instant Scaling"],
-    price: "$9.99",
-    icon: Server,
+    title: "E-Commerce Integration",
+    description: "Launch or upgrade your online store with flexibility",
+    features: [
+      "Payment Gateway Integration",
+      "Secure Checkout",
+      "CMS & Inventory Systems",
+    ],
+    price: "Starting at ₹25,000",
+    icon: ShoppingCart,
     popular: true,
-    href: "/store?category=VPS",
+    href: "/services/ecommerce",
   },
   {
-    title: "Game Servers",
-    description: "Maximum performance and security",
-    features: ["Enterprise Hardware", "DDoS Protection", "24/7 Support"],
-    price: "$3.50",
-    icon: Cpu,
-    href: "/store?category=Minecraft",
+    title: "Performance Optimization",
+    description: "Speed up and improve your existing app or site",
+    features: [
+      "Speed & SEO Boosting",
+      "Cloud & CDN Setup",
+      "Responsive Fixes",
+    ],
+    price: "Starting at ₹12,000",
+    icon: Rocket,
+    href: "/services/performance",
   },
 ];
 
@@ -58,29 +71,30 @@ export default function Home() {
         <Hero
           cards={[
             {
-              title: "High-Performance Servers",
-              description: "Enterprise-grade hardware for optimal performance",
-              icon: Server,
+              title: "Custom-Built Applications",
+              description: "Tailored mobile and web apps that align with your business goals",
+              icon: Code,
             },
             {
-              title: "DDoS Protection",
+              title: "Secure Payment Integration",
               description:
-                "Advanced security measures to keep your servers safe",
+                "Built-in Payment gateways and end-to-end security for peace of mind",
               icon: Shield,
             },
             {
-              title: "Latest Technology",
-              description: "Cutting-edge infrastructure for maximum efficiency",
+              title: "Modern Tech Stack",
+              description: "We use the latest frameworks and tools to build fast, scalable solutions",
               icon: Cpu,
             },
           ]}
           title={
             <>
-              High-Performance{" "}
-              <span className="text-primary">Hosting Solutions</span>
+              Next Gen{" "}
+              <span className="text-primary">Development</span>
+              {" "}Services
             </>
           }
-          description="Deploy your applications in seconds with our reliable and scalable cloud infrastructure. Experience the perfect balance of performance, security, and simplicity."
+          description="Launch powerful digital experiences with our full-stack development solutions. From mobile apps to scalable web platforms — we deliver performance, security, and seamless integration."
           showCards={true}
           showCTA={true}
           ctaText="Get Started"
@@ -91,9 +105,9 @@ export default function Home() {
           }}
           // cards={features}
           badge={{
-            text: "Use code INDIA50 for 50% off",
-            copyText: "INDIA50",
-            variant: "warning",
+            text: "New Service launched!",
+            // copyText: "New Service launched!",
+            variant: "magic",
           }}
         />
 
@@ -103,19 +117,18 @@ export default function Home() {
           <div className="container px-4">
             <div className="text-center mb-12">
               <Badge className="mb-4">Our Services</Badge>
-              <h2 className="text-3xl font-bold mb-4">Hosting Solutions</h2>
+              <h2 className="text-3xl font-bold mb-4">Our Services</h2>
               <p className="text-muted-foreground max-w-2xl mx-auto">
-                Choose the perfect hosting solution for your needs
+                Choose the perfect development solution for your needs
               </p>
             </div>
 
             <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-              {hostingServices.map((service) => (
+              {developmentServices.map((service) => (
                 <div
                   key={service.title}
-                  className={`relative rounded-lg bg-card/20 hover:bg-card/10 border p-6 transition-colors duration-500 ${
-                    service.popular ? "border-primary shadow-lg" : ""
-                  }`}
+                  className={`relative rounded-lg bg-card/20 hover:bg-card/10 border p-6 transition-colors duration-500 ${service.popular ? "border-primary shadow-lg" : ""
+                    }`}
                 >
                   {service.popular && (
                     <Badge className="absolute -top-3 left-1/2 -translate-x-1/2">
@@ -160,17 +173,16 @@ export default function Home() {
           <div className="container px-4">
             <div className="rounded-lg border bg-gradient-to-r from-accent/10 via-accent/20 to-accent/10 p-12 text-center shadow-lg">
               <Badge className="mb-4">Get Started</Badge>
-              <h2 className="text-4xl font-bold mb-4">Ready to Get Started?</h2>
+              <h2 className="text-4xl font-bold mb-4">Ready to Build Something Great?</h2>
               <p className="text-muted-foreground max-w-2xl mx-auto mb-8">
-                Join our satisfied customers who trust Avlanc for their hosting
-                needs
+                Join startups, creators, and businesses who trust Avlanc for their app and web development needs — now with seamless Payment integration.
               </p>
               <div className="flex flex-col sm:flex-row justify-center gap-4">
                 <Button size="lg" asChild>
-                  <Link href="/store">Visit Store</Link>
+                  <Link href="/services">Explore Services</Link>
                 </Button>
                 <Button size="lg" variant="outline" asChild>
-                  <Link href="/contact">Contact Sales</Link>
+                  <Link href="/contact">Talk to Our Team</Link>
                 </Button>
               </div>
               <div className="mt-8">
@@ -189,6 +201,7 @@ export default function Home() {
             </div>
           </div>
         </section>
+
       </div>
     </main>
   );

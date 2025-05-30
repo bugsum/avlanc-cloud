@@ -7,7 +7,6 @@ import { Header } from "@/components/header/header";
 // import { Announcement } from "@/components/ui/announcement";
 import { ChatWidget } from "@/components/chat-widget";
 import { ubuntu } from "@/lib/fonts";
-import { Banner2 } from "@/components/Banner";
 
 // const inter = Inter({ subsets: ["latin"] });
 
@@ -62,7 +61,7 @@ export default function RootLayout({
         className={cn(
           "min-h-screen bg-background antialiased relative",
           ubuntu.className
-        )}
+        )} suppressHydrationWarning
       >
         <ThemeProvider
           attribute="class"
