@@ -7,7 +7,7 @@ export default function PoliciesPage() {
   return (
     <div className="container mx-auto py-12">
       <h1 className="text-4xl font-bold mb-8">AVLANC Policies</h1>
-      
+
       <ScrollArea className="max-w-4xl">
         <Card>
           <CardHeader>
@@ -17,6 +17,7 @@ export default function PoliciesPage() {
             <div className="space-y-8">
               {/* Terms & Conditions */}
               <div>
+                <p className="text-md font-semibold mb-4">Name: Samarth Sharma</p>
                 <p className="text-lg font-semibold mb-4">Welcome to AVLANC</p>
                 <p className="text-muted-foreground">
                   Welcome to AVLANC, a digital development studio located in Indore, Madhya Pradesh. By accessing our website https://www.avlanc.com or engaging in our services, you agree to the following Terms and Conditions. These terms serve as a binding agreement between AVLANC and the user (client/customer).
