@@ -145,9 +145,9 @@ export default function PoliciesPage() {
                     <p className="text-muted-foreground">
                       Refunds are only considered if the client cancels the project before development begins, and work has not yet started.
                     </p>
-                    <p className="text-muted-foreground">
+                    {/* <p className="text-muted-foreground">
                       If a refund is approved, up to 80% of the paid amount may be refunded, after deducting administrative and planning costs.
-                    </p>
+                    </p> */}
                     <p className="text-muted-foreground">
                       Once development work has begun, no refund will be provided under any circumstance.
                     </p>
