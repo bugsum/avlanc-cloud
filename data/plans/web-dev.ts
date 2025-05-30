@@ -2,15 +2,11 @@ import { Plan } from '@/types';
 
 export const webDevPlans: Plan[] = [
     {
+        id: 'web-basic',
         title: 'Basic Website',
         price: 1499,
         category: 'Web Development',
-        // specs: {
-        //     ram: 'N/A',
-        //     cpu: 'N/A',
-        //     disk: 'N/A',
-        //     database: '1 Database',
-        // },
+        description: 'Perfect for small businesses and individuals looking to establish their online presence with a simple, professional website.',
         features: [
             'Responsive Design',
             '3 Pages',
@@ -20,15 +16,11 @@ export const webDevPlans: Plan[] = [
         href: '/store/web-dev/basic',
     },
     {
+        id: 'web-starter',
         title: 'Starter Website',
         price: 2499,
         category: 'Web Development',
-        // specs: {
-        //     ram: 'N/A',
-        //     cpu: 'N/A',
-        //     disk: 'N/A',
-        //     database: '1 Database',
-        // },
+        description: 'Ideal for growing businesses that need a more comprehensive online presence with additional pages and features.',
         features: [
             'Responsive Design',
             '5 Pages',
@@ -38,15 +30,11 @@ export const webDevPlans: Plan[] = [
         href: '/store/web-dev/starter',
     },
     {
+        id: 'web-professional',
         title: 'Professional Website',
         price: 3999,
         category: 'Web Development',
-        // specs: {
-        //     ram: 'N/A',
-        //     cpu: 'N/A',
-        //     disk: 'N/A',
-        //     database: '3 Databases',
-        // },
+        description: 'A complete web solution for businesses that need a professional online presence with content management capabilities.',
         features: [
             '10 Pages',
             'Custom CMS Setup',
@@ -56,15 +44,11 @@ export const webDevPlans: Plan[] = [
         href: '/store/web-dev/professional',
     },
     {
+        id: 'web-business',
         title: 'Business Website',
         price: 6999,
         category: 'Web Development',
-        // specs: {
-        //     ram: 'N/A',
-        //     cpu: 'N/A',
-        //     disk: 'N/A',
-        //     database: 'Unlimited Databases',
-        // },
+        description: 'Advanced web solution for established businesses that require a powerful online presence with custom features.',
         features: [
             '10+ Pages',
             'Custom CMS Integration',
@@ -75,41 +59,31 @@ export const webDevPlans: Plan[] = [
         href: '/store/web-dev/business',
     },
     {
+        id: 'web-ecommerce',
         title: 'E-Commerce Website',
         price: 11999,
         category: 'Web Development',
-        // specs: {
-        //     ram: 'N/A',
-        //     cpu: 'N/A',
-        //     disk: 'N/A',
-        //     database: 'Unlimited',
-        //     storage: 'Unlimited',
-        // },
+        description: 'Complete e-commerce solution to start selling your products online with a professional storefront.',
         features: [
-            // 'Payment Gateway Integration',
             'Shopping Cart',
             'Product Management',
             'User Authentication',
+            'Order Tracking',
         ],
         href: '/store/web-dev/ecommerce',
     },
     {
+        id: 'web-enterprise',
         title: 'Enterprise Web Solution',
         price: 24999,
         category: 'Web Development',
-        // specs: {
-        //     ram: 'N/A',
-        //     cpu: 'N/A',
-        //     disk: 'N/A',
-        //     database: 'Unlimited',
-        //     storage: 'Unlimited',
-        //     backup: 'Daily',
-        // },
+        description: 'Custom-built web solution for large enterprises with complex requirements and high traffic needs.',
         features: [
-            'Custom Architecture',
-            'High Traffic Optimization',
-            'Multi-region Deployment',
-            'Dedicated Support',
+            'Custom Development',
+            'API Integrations',
+            'Advanced Security',
+            'Priority Support',
+            'Dedicated Account Manager',
         ],
         href: '/store/web-dev/enterprise',
     },
