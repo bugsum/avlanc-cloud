@@ -5,11 +5,11 @@ export const appDevPlans: Plan[] = [
         title: 'Basic Mobile App',
         price: 4999,
         category: 'App Development',
-        specs: {
-            ram: 'N/A',
-            cpu: 'N/A',
-            storage: '500 MB',
-        },
+        // specs: {
+        //     ram: 'N/A',
+        //     cpu: 'N/A',
+        //     storage: '500 MB',
+        // },
         features: [
             'Simple UI',
             'Basic Features',
@@ -21,11 +21,11 @@ export const appDevPlans: Plan[] = [
         title: 'MVP Mobile App',
         price: 8999,
         category: 'App Development',
-        specs: {
-            ram: 'N/A',
-            cpu: 'N/A',
-            storage: '1 GB',
-        },
+        // specs: {
+        //     ram: 'N/A',
+        //     cpu: 'N/A',
+        //     storage: '1 GB',
+        // },
         features: [
             'Cross-Platform (React Native)',
             'User Auth',
@@ -38,12 +38,12 @@ export const appDevPlans: Plan[] = [
         title: 'Standard Mobile App',
         price: 14999,
         category: 'App Development',
-        specs: {
-            ram: 'N/A',
-            cpu: 'N/A',
-            storage: '2 GB',
-            backup: 'Weekly',
-        },
+        // specs: {
+        //     ram: 'N/A',
+        //     cpu: 'N/A',
+        //     storage: '2 GB',
+        //     backup: 'Weekly',
+        // },
         features: [
             'Cross-Platform',
             'Push Notifications',
@@ -56,12 +56,12 @@ export const appDevPlans: Plan[] = [
         title: 'Full-Stack App',
         price: 22999,
         category: 'App Development',
-        specs: {
-            ram: 'N/A',
-            cpu: 'N/A',
-            storage: '5 GB',
-            backup: 'Weekly',
-        },
+        // specs: {
+        //     ram: 'N/A',
+        //     cpu: 'N/A',
+        //     storage: '5 GB',
+        //     backup: 'Weekly',
+        // },
         features: [
             'iOS & Android',
             'Admin Dashboard',
@@ -75,12 +75,12 @@ export const appDevPlans: Plan[] = [
         title: 'Enterprise App',
         price: 49999,
         category: 'App Development',
-        specs: {
-            ram: 'N/A',
-            cpu: 'N/A',
-            storage: 'Unlimited',
-            backup: 'Daily',
-        },
+        // specs: {
+        //     ram: 'N/A',
+        //     cpu: 'N/A',
+        //     storage: 'Unlimited',
+        //     backup: 'Daily',
+        // },
         features: [
             'Custom Architecture',
             'CI/CD Pipeline',
@@ -93,12 +93,12 @@ export const appDevPlans: Plan[] = [
         title: 'Custom App Development',
         price: 0, // custom quote
         category: 'App Development',
-        specs: {
-            ram: 'Custom',
-            cpu: 'Custom',
-            storage: 'Custom',
-            backup: 'Custom',
-        },
+        // specs: {
+        //     ram: 'Custom',
+        //     cpu: 'Custom',
+        //     storage: 'Custom',
+        //     backup: 'Custom',
+        // },
         features: [
             'Tailored to Your Business Needs',
             'Flexible Technologies',

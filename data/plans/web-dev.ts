@@ -5,12 +5,12 @@ export const webDevPlans: Plan[] = [
         title: 'Basic Website',
         price: 1499,
         category: 'Web Development',
-        specs: {
-            ram: 'N/A',
-            cpu: 'N/A',
-            disk: 'N/A',
-            database: '1 Database',
-        },
+        // specs: {
+        //     ram: 'N/A',
+        //     cpu: 'N/A',
+        //     disk: 'N/A',
+        //     database: '1 Database',
+        // },
         features: [
             'Responsive Design',
             '3 Pages',
@@ -23,12 +23,12 @@ export const webDevPlans: Plan[] = [
         title: 'Starter Website',
         price: 2499,
         category: 'Web Development',
-        specs: {
-            ram: 'N/A',
-            cpu: 'N/A',
-            disk: 'N/A',
-            database: '1 Database',
-        },
+        // specs: {
+        //     ram: 'N/A',
+        //     cpu: 'N/A',
+        //     disk: 'N/A',
+        //     database: '1 Database',
+        // },
         features: [
             'Responsive Design',
             '5 Pages',
@@ -41,12 +41,12 @@ export const webDevPlans: Plan[] = [
         title: 'Professional Website',
         price: 3999,
         category: 'Web Development',
-        specs: {
-            ram: 'N/A',
-            cpu: 'N/A',
-            disk: 'N/A',
-            database: '3 Databases',
-        },
+        // specs: {
+        //     ram: 'N/A',
+        //     cpu: 'N/A',
+        //     disk: 'N/A',
+        //     database: '3 Databases',
+        // },
         features: [
             '10 Pages',
             'Custom CMS Setup',
@@ -59,12 +59,12 @@ export const webDevPlans: Plan[] = [
         title: 'Business Website',
         price: 6999,
         category: 'Web Development',
-        specs: {
-            ram: 'N/A',
-            cpu: 'N/A',
-            disk: 'N/A',
-            database: 'Unlimited Databases',
-        },
+        // specs: {
+        //     ram: 'N/A',
+        //     cpu: 'N/A',
+        //     disk: 'N/A',
+        //     database: 'Unlimited Databases',
+        // },
         features: [
             '10+ Pages',
             'Custom CMS Integration',
@@ -78,13 +78,13 @@ export const webDevPlans: Plan[] = [
         title: 'E-Commerce Website',
         price: 11999,
         category: 'Web Development',
-        specs: {
-            ram: 'N/A',
-            cpu: 'N/A',
-            disk: 'N/A',
-            database: 'Unlimited',
-            storage: 'Unlimited',
-        },
+        // specs: {
+        //     ram: 'N/A',
+        //     cpu: 'N/A',
+        //     disk: 'N/A',
+        //     database: 'Unlimited',
+        //     storage: 'Unlimited',
+        // },
         features: [
             'Payment Gateway Integration',
             'Shopping Cart',
@@ -97,14 +97,14 @@ export const webDevPlans: Plan[] = [
         title: 'Enterprise Web Solution',
         price: 24999,
         category: 'Web Development',
-        specs: {
-            ram: 'N/A',
-            cpu: 'N/A',
-            disk: 'N/A',
-            database: 'Unlimited',
-            storage: 'Unlimited',
-            backup: 'Daily',
-        },
+        // specs: {
+        //     ram: 'N/A',
+        //     cpu: 'N/A',
+        //     disk: 'N/A',
+        //     database: 'Unlimited',
+        //     storage: 'Unlimited',
+        //     backup: 'Daily',
+        // },
         features: [
             'Custom Architecture',
             'High Traffic Optimization',
