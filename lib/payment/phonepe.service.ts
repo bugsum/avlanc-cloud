@@ -9,6 +9,17 @@ export class PhonePeService {
 
   private constructor(config: PhonePeConfig) {
     this.config = config;
+    console.log('PhonePeService initialized with config:', {
+      merchantId: config.merchantId,
+      clientId: config.clientId,
+      clientVersion: config.clientVersion,
+      apiBaseUrl: config.apiBaseUrl,
+      redirectUrl: config.redirectUrl,
+      callbackUrl: config.callbackUrl,
+      // Don't log sensitive data
+      saltKey: config.saltKey ? '***' : undefined,
+      saltIndex: config.saltIndex,
+    });
   }
 
   public static getInstance(config: PhonePeConfig): PhonePeService {
@@ -36,12 +47,14 @@ export class PhonePeService {
   private async getAccessToken(): Promise<string> {
     // Check if we have a valid token
     if (this.accessToken && Date.now() < this.tokenExpiry) {
-      console.log('Using existing access token');
+      console.log('Using existing access token, expires at:', new Date(this.tokenExpiry).toISOString());
       return this.accessToken;
     }
 
     try {
       console.log('Requesting new access token...');
+      console.log('Environment:', this.config.apiBaseUrl.includes('preprod') ? 'UAT' : 'PROD');
+      
       const formData = new URLSearchParams();
       formData.append('client_id', this.config.clientId);
       formData.append('client_version', this.config.clientVersion);
@@ -53,8 +66,20 @@ export class PhonePeService {
         ? 'https://api-preprod.phonepe.com/apis/pg-sandbox/v1/oauth/token'
         : 'https://api.phonepe.com/apis/identity-manager/v1/oauth/token';
 
-      console.log('Token request URL:', authUrl);
-      console.log('Token request payload:', formData.toString());
+      console.log('Token request details:', {
+        url: authUrl,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: {
+          client_id: this.config.clientId,
+          client_version: this.config.clientVersion,
+          grant_type: 'client_credentials',
+          // Don't log sensitive data
+          client_secret: this.config.clientSecret,
+        },
+      });
 
       const response = await fetch(authUrl, {
         method: 'POST',
@@ -64,21 +89,41 @@ export class PhonePeService {
         body: formData,
       });
 
-      const data = await response.json();
-      console.log('Token response:', JSON.stringify(data, null, 2));
+      console.log('Token response status:', response.status);
+      console.log('Token response headers:', Object.fromEntries(response.headers.entries()));
 
-      if (!response.ok || !data.access_token) {
-        console.error('Authentication response:', data);
-        throw new Error(`Failed to authenticate with PhonePe: ${data.message || 'Unknown error'}`);
+      const data = await response.json();
+      console.log('Token response body:', JSON.stringify(data, null, 2));
+
+      if (!response.ok) {
+        console.error('Authentication failed:', {
+          status: response.status,
+          statusText: response.statusText,
+          data: data,
+        });
+        throw new Error(`Failed to authenticate with PhonePe: ${data.message || data.error || 'Unknown error'}`);
+      }
+
+      if (!data.access_token) {
+        console.error('No access token in response:', data);
+        throw new Error('No access token received from PhonePe');
       }
 
       this.accessToken = data.access_token;
       this.tokenExpiry = data.expires_at * 1000; // Convert to milliseconds
-      console.log('New access token obtained, expires at:', new Date(this.tokenExpiry).toISOString());
+      console.log('New access token obtained:', {
+        token: this.accessToken.substring(0, 10) + '...',
+        expiresAt: new Date(this.tokenExpiry).toISOString(),
+        tokenType: data.token_type,
+      });
 
       return this.accessToken;
     } catch (error) {
-      console.error('Error getting access token:', error);
+      console.error('Error getting access token:', {
+        name: error instanceof Error ? error.name : 'Unknown',
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined,
+      });
       throw error;
     }
   }
@@ -90,14 +135,19 @@ export class PhonePeService {
       const payload = JSON.stringify(request);
       const xVerify = this.generateXVerify(payload, '/pg/v1/pay');
 
-      console.log('Making payment request to:', `${this.config.apiBaseUrl}/pg/v1/pay`);
-      console.log('Request headers:', {
-        'Content-Type': 'application/json',
-        'Authorization': `O-Bearer ${accessToken}`,
-        'X-VERIFY': xVerify,
+      const paymentUrl = `${this.config.apiBaseUrl}/pg/v1/pay`;
+      console.log('Payment request details:', {
+        url: paymentUrl,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `O-Bearer ${accessToken.substring(0, 10)}...`,
+          'X-VERIFY': xVerify,
+        },
+        body: request,
       });
 
-      const response = await fetch(`${this.config.apiBaseUrl}/pg/v1/pay`, {
+      const response = await fetch(paymentUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -107,10 +157,18 @@ export class PhonePeService {
         body: payload,
       });
 
+      console.log('Payment response status:', response.status);
+      console.log('Payment response headers:', Object.fromEntries(response.headers.entries()));
+
       const data = await response.json();
-      console.log('Payment response:', JSON.stringify(data, null, 2));
+      console.log('Payment response body:', JSON.stringify(data, null, 2));
 
       if (!response.ok) {
+        console.error('Payment initiation failed:', {
+          status: response.status,
+          statusText: response.statusText,
+          data: data,
+        });
         throw new Error(data.message || 'Failed to initiate payment');
       }
 
@@ -121,7 +179,11 @@ export class PhonePeService {
         redirectUrl: data.redirectUrl,
       };
     } catch (error) {
-      console.error('Error initiating payment:', error);
+      console.error('Error initiating payment:', {
+        name: error instanceof Error ? error.name : 'Unknown',
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined,
+      });
       throw error;
     }
   }
@@ -133,29 +195,48 @@ export class PhonePeService {
       const endpoint = `/pg/v1/status/${this.config.merchantId}/${merchantOrderId}`;
       const xVerify = this.generateXVerify('', endpoint);
 
-      console.log('Making status request to:', `${this.config.apiBaseUrl}${endpoint}`);
-      const response = await fetch(
-        `${this.config.apiBaseUrl}${endpoint}`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `O-Bearer ${accessToken}`,
-            'X-VERIFY': xVerify,
-          },
-        }
-      );
+      const statusUrl = `${this.config.apiBaseUrl}${endpoint}`;
+      console.log('Status request details:', {
+        url: statusUrl,
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `O-Bearer ${accessToken.substring(0, 10)}...`,
+          'X-VERIFY': xVerify,
+        },
+      });
+
+      const response = await fetch(statusUrl, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `O-Bearer ${accessToken}`,
+          'X-VERIFY': xVerify,
+        },
+      });
+
+      console.log('Status response status:', response.status);
+      console.log('Status response headers:', Object.fromEntries(response.headers.entries()));
 
       const data = await response.json();
-      console.log('Status response:', JSON.stringify(data, null, 2));
+      console.log('Status response body:', JSON.stringify(data, null, 2));
 
       if (!response.ok) {
+        console.error('Status check failed:', {
+          status: response.status,
+          statusText: response.statusText,
+          data: data,
+        });
         throw new Error(data.message || 'Failed to check payment status');
       }
 
       return data;
     } catch (error) {
-      console.error('Error checking payment status:', error);
+      console.error('Error checking payment status:', {
+        name: error instanceof Error ? error.name : 'Unknown',
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined,
+      });
       throw error;
     }
   }
@@ -166,11 +247,18 @@ export class PhonePeService {
       const data = payload + '/pg/v1/webhook' + this.config.saltKey;
       const sha256 = crypto.createHash('sha256').update(data).digest('hex');
       const expectedSignature = sha256 + '###' + this.config.saltIndex;
-      console.log('Expected signature:', expectedSignature);
-      console.log('Received signature:', signature);
+      console.log('Signature verification:', {
+        expected: expectedSignature,
+        received: signature,
+        matches: signature === expectedSignature,
+      });
       return signature === expectedSignature;
     } catch (error) {
-      console.error('Error verifying webhook signature:', error);
+      console.error('Error verifying webhook signature:', {
+        name: error instanceof Error ? error.name : 'Unknown',
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined,
+      });
       return false;
     }
   }
