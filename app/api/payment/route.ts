@@ -8,8 +8,6 @@ const phonePeService = PhonePeService.getInstance({
   clientId: process.env.PHONEPE_CLIENT_ID!,
   clientSecret: process.env.PHONEPE_CLIENT_SECRET!,
   clientVersion: process.env.PHONEPE_CLIENT_VERSION!,
-  saltKey: process.env.PHONEPE_SALT_KEY!,
-  saltIndex: parseInt(process.env.PHONEPE_SALT_INDEX || '1'),
   apiBaseUrl: process.env.NEXT_PUBLIC_PHONEPE_API_BASE_URL!,
   redirectUrl: process.env.NEXT_PUBLIC_PHONEPE_REDIRECT_URL!,
   callbackUrl: process.env.NEXT_PUBLIC_PHONEPE_CALLBACK_URL!,
@@ -17,64 +15,49 @@ const phonePeService = PhonePeService.getInstance({
 
 export async function POST(request: NextRequest) {
   try {
-    // Log environment variables (without sensitive data)
-    console.log('API Base URL:', process.env.NEXT_PUBLIC_PHONEPE_API_BASE_URL);
-    console.log('Merchant ID:', process.env.NEXT_PUBLIC_PHONEPE_MERCHANT_ID);
-    console.log('Redirect URL:', process.env.NEXT_PUBLIC_PHONEPE_REDIRECT_URL);
-    console.log('Callback URL:', process.env.NEXT_PUBLIC_PHONEPE_CALLBACK_URL);
-
     const body = await request.json();
-    console.log('Received payment request body:', JSON.stringify(body, null, 2));
 
     // Validate required fields
-    if (!body.merchantOrderId || !body.amount) {
+    if (!body.merchantOrderId || !body.amount || !body.merchantUserId) {
       return NextResponse.json(
-        { error: 'Missing required fields: merchantOrderId and amount are required' },
+        { error: 'Missing required fields: merchantOrderId, amount, and merchantUserId are required' },
         { status: 400 }
       );
     }
 
+    // Generate a unique transaction ID
+    const merchantTransactionId = `TXN_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
+
     const paymentRequest: PaymentRequest = {
       merchantOrderId: body.merchantOrderId,
       amount: body.amount,
-      expireAfter: body.expireAfter || 1200, // Default 20 minutes
-      metaInfo: body.metaInfo || {},
+      merchantUserId: body.merchantUserId,
+      merchantTransactionId,
       paymentFlow: {
         type: 'PG_CHECKOUT',
         message: body.message || 'Payment for order',
         merchantUrls: {
-          redirectUrl: body.merchantUrls?.redirectUrl || process.env.NEXT_PUBLIC_PHONEPE_REDIRECT_URL!,
-        },
-        paymentModeConfig: body.paymentModeConfig || {
-          enabledPaymentModes: [
-            { type: 'UPI_INTENT' },
-            { type: 'UPI_COLLECT' },
-            { type: 'UPI_QR' },
-            { type: 'NET_BANKING' },
-            { type: 'CARD', cardTypes: ['DEBIT_CARD', 'CREDIT_CARD'] }
-          ]
+          redirectUrl: body.redirectUrl || process.env.NEXT_PUBLIC_PHONEPE_REDIRECT_URL!,
+          callbackUrl: body.callbackUrl || process.env.NEXT_PUBLIC_PHONEPE_CALLBACK_URL!,
         },
       },
+      metaInfo: body.metaInfo || {},
     };
 
-    console.log('Constructed payment request:', JSON.stringify(paymentRequest, null, 2));
-
     const response = await phonePeService.initiatePayment(paymentRequest);
-    console.log('Payment initiation response:', JSON.stringify(response, null, 2));
+
+    if (!response.success) {
+      return NextResponse.json(
+        { error: response.message || 'Failed to initiate payment' },
+        { status: 400 }
+      );
+    }
 
     return NextResponse.json(response);
   } catch (error) {
-    console.error('Detailed error in payment processing:', error);
-    if (error instanceof Error) {
-      console.error('Error name:', error.name);
-      console.error('Error message:', error.message);
-      console.error('Error stack:', error.stack);
-    }
+    console.error('Error processing payment:', error);
     return NextResponse.json(
-      { 
-        error: 'Failed to process payment request',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      },
+      { error: 'Failed to process payment request' },
       { status: 500 }
     );
   }

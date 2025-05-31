@@ -3,8 +3,6 @@ export interface PhonePeConfig {
   clientId: string;
   clientSecret: string;
   clientVersion: string;
-  saltKey: string;
-  saltIndex: number;
   apiBaseUrl: string;
   redirectUrl: string;
   callbackUrl: string;
@@ -12,49 +10,17 @@ export interface PhonePeConfig {
 
 export interface PaymentRequest {
   merchantOrderId: string;
-  amount: number; // in paise
-  expireAfter?: number; // in seconds, default 1200 (20 mins)
-  metaInfo?: {
-    udf1?: string;
-    udf2?: string;
-    udf3?: string;
-    udf4?: string;
-    udf5?: string;
-    [key: string]: any;
-  };
+  amount: number;
+  merchantUserId: string;
+  merchantTransactionId: string;
   paymentFlow: {
     type: 'PG_CHECKOUT';
     message?: string;
     merchantUrls: {
       redirectUrl: string;
-    };
-    paymentModeConfig?: {
-      enabledPaymentModes?: Array<{
-        type: 'UPI_INTENT' | 'UPI_COLLECT' | 'UPI_QR' | 'NET_BANKING' | 'CARD';
-        cardTypes?: Array<'DEBIT_CARD' | 'CREDIT_CARD'>;
-      }>;
-      disabledPaymentModes?: Array<{
-        type: 'UPI_INTENT' | 'UPI_COLLECT' | 'UPI_QR' | 'NET_BANKING' | 'CARD';
-        cardTypes?: Array<'DEBIT_CARD' | 'CREDIT_CARD'>;
-      }>;
+      callbackUrl: string;
     };
   };
-}
-
-export interface PaymentResponse {
-  orderId: string;
-  state: PaymentState;
-  expireAt: number;
-  redirectUrl: string;
-}
-
-export type PaymentState = 'PENDING' | 'COMPLETED' | 'FAILED';
-
-export interface PaymentStatus {
-  orderId: string;
-  state: PaymentState;
-  amount: number;
-  expireAt: number;
   metaInfo?: {
     udf1?: string;
     udf2?: string;
@@ -62,46 +28,40 @@ export interface PaymentStatus {
     udf4?: string;
     udf5?: string;
   };
-  paymentDetails: Array<{
-    paymentMode: 'UPI_INTENT' | 'UPI_COLLECT' | 'UPI_QR' | 'NET_BANKING' | 'CARD';
-    transactionId: string;
-    timestamp: number;
+}
+
+export interface PaymentResponse {
+  success: boolean;
+  code: string;
+  message: string;
+  data: {
+    merchantTransactionId: string;
+    merchantOrderId: string;
+    redirectUrl: string;
+    instrumentResponse: {
+      type: string;
+      redirectInfo: {
+        url: string;
+        method: string;
+      };
+    };
+  };
+}
+
+export interface PaymentStatus {
+  success: boolean;
+  code: string;
+  message: string;
+  data: {
+    merchantTransactionId: string;
+    merchantOrderId: string;
     amount: number;
-    state: PaymentState;
-    errorCode?: string;
-    detailedErrorCode?: string;
-    rail?: {
-      type: 'UPI' | 'PG';
+    state: 'PENDING' | 'COMPLETED' | 'FAILED';
+    responseCode: string;
+    paymentInstrument: {
+      type: string;
       utr?: string;
-      upiTransactionId?: string;
-      vpa?: string;
+      bankTransactionId?: string;
     };
-    instrument?: {
-      type: 'ACCOUNT' | 'CREDIT_CARD' | 'DEBIT_CARD' | 'NET_BANKING';
-      maskedAccountNumber?: string;
-      accountType?: string;
-      accountHolderName?: string;
-    };
-    splitInstruments?: Array<{
-      amount: number;
-      rail: {
-        type: 'UPI' | 'PG' | 'PPI_WALLET';
-        utr?: string;
-        upiTransactionId?: string;
-        vpa?: string;
-      };
-      instrument: {
-        type: 'ACCOUNT' | 'CREDIT_CARD' | 'DEBIT_CARD' | 'NET_BANKING' | 'WALLET';
-        maskedAccountNumber?: string;
-        accountType?: string;
-      };
-    }>;
-  }>;
-  errorContext?: {
-    errorCode: string;
-    detailedErrorCode: string;
-    source: string;
-    stage: string;
-    description: string;
   };
 } 
