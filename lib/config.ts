@@ -1,6 +1,8 @@
-export const config = {
+import { PhonePeConfig } from './phonepe/types';
+
+// Public config (safe to expose to browser)
+export const publicConfig = {
   phonepe: {
-    // Public config (safe to expose to browser)
     merchantId: process.env.NEXT_PUBLIC_PHONEPE_MERCHANT_ID || '',
     apiBaseUrl: process.env.NEXT_PUBLIC_PHONEPE_API_BASE_URL || 'https://api-preprod.phonepe.com',
     redirectUrl: process.env.NEXT_PUBLIC_PHONEPE_REDIRECT_URL || '',
@@ -20,6 +22,12 @@ export const serverConfig = {
     saltIndex: parseInt(process.env.PHONEPE_SALT_INDEX || '1', 10),
   },
 } as const;
+
+// Combined config for server-side use
+export const phonePeConfig: PhonePeConfig = {
+  ...publicConfig.phonepe,
+  ...serverConfig.phonepe,
+};
 
 // Validate required configuration
 const requiredPublicEnvVars = [

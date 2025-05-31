@@ -1,88 +1,78 @@
 import { NextResponse } from 'next/server';
-import { PhonePeConfig, PhonePeService } from '@/lib/phonepe.service';
-import { config } from '@/lib/config';
+import { PhonePeService } from '@/lib/phonepe/service';
+import { phonePeConfig } from '@/lib/config';
+import { WebhookPayload } from '@/lib/phonepe/types';
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, X-VERIFY',
+  'Content-Type': 'application/json',
+};
 
 // Initialize PhonePe service
-const phonePeService = PhonePeService.getInstance(config.phonepe as PhonePeConfig);
+const phonePeService = PhonePeService.getInstance(phonePeConfig);
 
 export async function POST(request: Request) {
   try {
-    // Get the raw body as text
-    const rawBody = await request.text();
-    if (!rawBody) {
-      console.error('Empty webhook payload');
-      return NextResponse.json(
-        { success: false, error: 'Empty webhook payload' },
-        { status: 400 }
-      );
-    }
-
-    // Verify webhook signature
-    const signature = request.headers.get('x-verify');
+    // Get the signature from headers
+    const signature = request.headers.get('X-VERIFY');
     if (!signature) {
-      console.error('Missing webhook signature');
       return NextResponse.json(
-        { success: false, error: 'Missing webhook signature' },
-        { status: 401 }
+        { success: false, error: 'Missing signature' },
+        { status: 401, headers: corsHeaders }
       );
     }
 
+    // Get the raw body for signature verification
+    const rawBody = await request.text();
+    const payload = JSON.parse(rawBody) as WebhookPayload;
+
+    // Verify the signature
     if (!phonePeService.verifyWebhookSignature(rawBody, signature)) {
-      console.error('Invalid webhook signature');
       return NextResponse.json(
-        { success: false, error: 'Invalid webhook signature' },
-        { status: 401 }
+        { success: false, error: 'Invalid signature' },
+        { status: 401, headers: corsHeaders }
       );
     }
 
-    // Parse the webhook payload
-    const webhookData = JSON.parse(rawBody);
-    const { merchantOrderId, transactionId, state, code, message } = webhookData;
-
-    if (!merchantOrderId) {
-      console.error('Missing merchantOrderId in webhook');
-      return NextResponse.json(
-        { success: false, error: 'Missing merchantOrderId' },
-        { status: 400 }
-      );
-    }
-
-    // Log the webhook for debugging
-    console.log('Received payment webhook:', {
-      merchantOrderId,
-      transactionId,
-      state,
-      code,
-      message,
+    // Process the webhook
+    console.log('Processing webhook:', {
+      merchantOrderId: payload.merchantOrderId,
+      transactionId: payload.transactionId,
+      amount: payload.amount,
+      state: payload.state,
+      paymentState: payload.paymentState,
+      paymentMessage: payload.paymentMessage,
+      paymentTime: payload.paymentTime ? new Date(payload.paymentTime).toISOString() : null,
     });
 
-    // Here you would typically:
-    // 1. Update your database with the payment status
-    // 2. Send confirmation emails
-    // 3. Update inventory
-    // 4. Trigger any other business logic
+    // TODO: Update your database with the payment status
+    // This is where you would typically update your database with the payment status
+    // For example:
+    // await updatePaymentStatus(payload.merchantOrderId, {
+    //   transactionId: payload.transactionId,
+    //   status: payload.state,
+    //   amount: payload.amount,
+    //   paymentTime: payload.paymentTime ? new Date(payload.paymentTime) : new Date(),
+    //   paymentMessage: payload.paymentMessage,
+    //   paymentState: payload.paymentState,
+    //   rawResponse: rawBody,
+    // });
 
-    // For now, we'll just acknowledge receipt
-    return NextResponse.json({ success: true });
-
+    return NextResponse.json({ success: true }, { headers: corsHeaders });
   } catch (error) {
-    console.error('Error processing webhook:', error);
+    console.error('Webhook processing error:', error);
     return NextResponse.json(
       { 
         success: false, 
         error: error instanceof Error ? error.message : 'Failed to process webhook',
       },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     );
   }
 }
 
 export async function OPTIONS() {
-  return NextResponse.json({}, {
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, X-VERIFY',
-    },
-  });
+  return NextResponse.json({}, { headers: corsHeaders });
 } 
