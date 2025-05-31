@@ -3,23 +3,21 @@ import { createHash } from 'crypto';
 // Environment configuration
 const ENV = {
   // OAuth2 Credentials
-  CLIENT_ID: process.env.PHONEPE_CLIENT_ID!,
-  CLIENT_SECRET: process.env.PHONEPE_CLIENT_SECRET!,
-  MERCHANT_ID: process.env.PHONEPE_MERCHANT_ID!,
-  SALT_KEY: process.env.PHONEPE_SALT_KEY!,
-  SALT_INDEX: process.env.PHONEPE_SALT_INDEX || '1',
+  CLIENT_ID: process.env.NEXT_PUBLIC_PHONEPE_CLIENT_ID!,
+  CLIENT_SECRET: process.env.NEXT_PUBLIC_PHONEPE_CLIENT_SECRET!,
+  MERCHANT_ID: process.env.NEXT_PUBLIC_PHONEPE_MERCHANT_ID!,
+  SALT_KEY: process.env.NEXT_PUBLIC_PHONEPE_SALT_KEY!,
+  SALT_INDEX: process.env.NEXT_PUBLIC_PHONEPE_SALT_INDEX || '1',
 
   // API Endpoints
-  API_BASE_URL: process.env.NODE_ENV === 'production'
-    ? 'https://api.phonepe.com'
-    : 'https://api-preprod.phonepe.com',
+  API_BASE_URL: process.env.NEXT_PUBLIC_PHONEPE_API_BASE_URL || 'https://api-preprod.phonepe.com',
 
-  AUTH_URL: process.env.NODE_ENV === 'production'
-    ? 'https://api.phonepe.com/apis/identity-manager/v1/oauth/token'
-    : 'https://api-preprod.phonepe.com/apis/pg-sandbox/v1/oauth/token',
+  AUTH_URL: process.env.NEXT_PUBLIC_PHONEPE_API_BASE_URL 
+    ? `${process.env.NEXT_PUBLIC_PHONEPE_API_BASE_URL}/apis/merchant/authentication`
+    : 'https://api-preprod.phonepe.com/apis/merchant/authentication',
 
-  PAYMENT_URL: process.env.NODE_ENV === 'production'
-    ? 'https://api.phonepe.com/apis/pg/checkout/v2/pay'
+  PAYMENT_URL: process.env.NEXT_PUBLIC_PHONEPE_API_BASE_URL
+    ? `${process.env.NEXT_PUBLIC_PHONEPE_API_BASE_URL}/apis/pg-sandbox/checkout/v2/pay`
     : 'https://api-preprod.phonepe.com/apis/pg-sandbox/checkout/v2/pay',
 
   // Webhook
@@ -27,8 +25,9 @@ const ENV = {
   WEBHOOK_PASSWORD: process.env.PHONEPE_WEBHOOK_PASSWORD!,
 
   // Application
-  APP_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000',
-  REDIRECT_URL: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/payment/callback`
+  APP_BASE_URL: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+  REDIRECT_URL: process.env.NEXT_PUBLIC_PHONEPE_REDIRECT_URL || '',
+  CALLBACK_URL: process.env.NEXT_PUBLIC_PHONEPE_CALLBACK_URL || '',
 };
 
 // Types
@@ -416,6 +415,8 @@ export function createPaymentRequest(
 
 export interface PhonePeConfig {
   merchantId: string;
+  clientId: string;
+  clientSecret: string;
   saltKey: string;
   saltIndex: number;
   apiBaseUrl: string;
@@ -471,26 +472,28 @@ export class PhonePeService {
     }
 
     try {
+      const formData = new URLSearchParams();
+      formData.append('client_id', this.config.clientId);
+      formData.append('client_secret', this.config.clientSecret);
+      formData.append('grant_type', 'client_credentials');
+
       const response = await fetch(`${this.config.apiBaseUrl}/apis/merchant/authentication`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'X-VERIFY': this.generateXVerify('', '/apis/merchant/authentication'),
+          'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: JSON.stringify({
-          merchantId: this.config.merchantId,
-          saltKey: this.config.saltKey,
-          saltIndex: this.config.saltIndex,
-        }),
+        body: formData.toString(),
       });
 
       const data = await response.json();
       
       if (!response.ok) {
+        console.error('Authentication response:', data);
         throw new Error(data.message || 'Failed to get access token');
       }
 
       if (!data.token) {
+        console.error('No token in response:', data);
         throw new Error('No access token received');
       }
 
@@ -527,6 +530,8 @@ export class PhonePeService {
           : new Date(Date.now() + 30 * 60 * 1000).toISOString(), // 30 minutes default
       };
 
+      console.log('Payment payload:', payload);
+
       const response = await fetch(
         `${this.config.apiBaseUrl}/apis/pg-sandbox/checkout/v2/pay`,
         {
@@ -534,6 +539,8 @@ export class PhonePeService {
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${accessToken}`,
+            'X-CLIENT-ID': this.config.clientId,
+            'X-CLIENT-SECRET': this.config.clientSecret,
             'X-VERIFY': this.generateXVerify(JSON.stringify(payload), '/apis/pg-sandbox/checkout/v2/pay'),
           },
           body: JSON.stringify(payload),
@@ -541,6 +548,7 @@ export class PhonePeService {
       );
 
       const data = await response.json();
+      console.log('Payment response:', data);
 
       if (!response.ok) {
         return {
