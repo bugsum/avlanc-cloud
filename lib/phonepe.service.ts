@@ -1,3 +1,5 @@
+import { createHash } from 'crypto';
+
 // Environment configuration
 const ENV = {
   // OAuth2 Credentials
@@ -30,8 +32,8 @@ const ENV = {
 };
 
 // Types
-export type PaymentState = 'PENDING' | 'COMPLETED' | 'FAILED' | 'CONFIRMED';
-export type RefundState = 'PENDING' | 'CONFIRMED' | 'COMPLETED' | 'FAILED';
+export type PaymentState = 'PENDING' | 'COMPLETED' | 'FAILED';
+export type RefundState = 'PENDING' | 'COMPLETED' | 'FAILED';
 
 export interface OrderStatusResponse {
   orderId: string;
@@ -74,11 +76,12 @@ export interface RefundRequest {
 }
 
 export interface RefundResponse {
+  success: boolean;
   refundId: string;
-  amount: number;
   state: RefundState;
-  errorCode?: string;
-  detailedErrorCode?: string;
+  amount: number;
+  message?: string;
+  error?: string;
 }
 
 export interface RefundStatusResponse {
@@ -108,7 +111,11 @@ export interface RefundStatusResponse {
 export interface PaymentRequest {
   merchantOrderId: string;
   amount: number; // in paisa (1 INR = 100 paisa)
-  expireAfter?: number; // in seconds (default: 1200)
+  customer: {
+    name?: string;
+    email: string;
+    phone: string;
+  };
   metaInfo?: {
     udf1?: string;
     udf2?: string;
@@ -117,30 +124,19 @@ export interface PaymentRequest {
     udf5?: string;
     [key: string]: any;
   };
-  paymentFlow: {
+  paymentFlow?: {
     type: 'PG_CHECKOUT';
     message?: string;
     merchantUrls: {
       redirectUrl: string;
-    };
-    paymentModeConfig?: {
-      enabledPaymentModes?: Array<{
-        type: 'UPI_INTENT' | 'UPI_COLLECT' | 'UPI_QR' | 'NET_BANKING' | 'CARD';
-        cardTypes?: Array<'DEBIT_CARD' | 'CREDIT_CARD'>;
-      }>;
-      disabledPaymentModes?: Array<{
-        type: 'UPI_INTENT' | 'UPI_COLLECT' | 'UPI_QR' | 'NET_BANKING' | 'CARD';
-        cardTypes?: Array<'DEBIT_CARD' | 'CREDIT_CARD'>;
-      }>;
+      callbackUrl?: string;
     };
   };
-  customer?: {
-    name?: string;
-    email?: string;
-    phone?: string;
-    [key: string]: any;
+  expireAfter?: number; // in seconds
+  merchantUrls?: {
+    redirectUrl: string;
+    callbackUrl?: string;
   };
-  [key: string]: any;
 }
 
 export interface PaymentResponse {
@@ -249,16 +245,16 @@ export async function initiatePayment(
       merchantTransactionId,
       merchantUserId: `USER_${Date.now()}`,
       amount: request.amount,
-      redirectUrl: request.merchantRedirectUrl || ENV.REDIRECT_URL,
+      redirectUrl: request.merchantUrls?.redirectUrl || ENV.REDIRECT_URL,
       redirectMode: 'POST' as const,
-      callbackUrl: request.merchantCallbackUrl || ENV.REDIRECT_URL,
+      callbackUrl: request.merchantUrls?.callbackUrl || ENV.REDIRECT_URL,
       mobileNumber: request.customer?.phone,
       paymentInstrument: {
         type: 'PAY_PAGE' as const,
       },
       // Add default expiry time if not provided
-      expiry: request.expiresIn
-        ? new Date(Date.now() + request.expiresIn * 1000).toISOString()
+      expiry: request.expireAfter
+        ? new Date(Date.now() + request.expireAfter * 1000).toISOString()
         : new Date(Date.now() + 30 * 60 * 1000).toISOString(), // 30 minutes default
     };
 
@@ -416,4 +412,254 @@ export function createPaymentRequest(
       udf3: customer.phone,
     },
   };
+}
+
+export interface PhonePeConfig {
+  merchantId: string;
+  saltKey: string;
+  saltIndex: number;
+  apiBaseUrl: string;
+  redirectUrl: string;
+  callbackUrl: string;
+}
+
+export interface PaymentStatus {
+  success: boolean;
+  state: PaymentState;
+  transactionId?: string;
+  amount?: number;
+  currency?: string;
+  timestamp?: number;
+  message?: string;
+  metadata?: Record<string, any>;
+}
+
+export interface RefundRequest {
+  merchantOrderId: string;
+  transactionId: string;
+  amount: number; // in paisa
+  reason?: string;
+}
+
+// PhonePe Service Class
+export class PhonePeService {
+  private static instance: PhonePeService;
+  private config: PhonePeConfig;
+  private accessToken: string | null = null;
+  private tokenExpiry: number = 0;
+
+  private constructor(config: PhonePeConfig) {
+    this.config = config;
+  }
+
+  public static getInstance(config: PhonePeConfig): PhonePeService {
+    if (!PhonePeService.instance) {
+      PhonePeService.instance = new PhonePeService(config);
+    }
+    return PhonePeService.instance;
+  }
+
+  private generateXVerify(payload: string, path: string): string {
+    const baseString = payload + path + this.config.saltKey;
+    return createHash('sha256').update(baseString).digest('hex');
+  }
+
+  private async getAccessToken(): Promise<string> {
+    // Check if we have a valid token
+    if (this.accessToken && Date.now() < this.tokenExpiry) {
+      return this.accessToken;
+    }
+
+    try {
+      const response = await fetch(`${this.config.apiBaseUrl}/apis/merchant/authentication`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-VERIFY': this.generateXVerify('', '/apis/merchant/authentication'),
+        },
+        body: JSON.stringify({
+          merchantId: this.config.merchantId,
+          saltKey: this.config.saltKey,
+          saltIndex: this.config.saltIndex,
+        }),
+      });
+
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to get access token');
+      }
+
+      if (!data.token) {
+        throw new Error('No access token received');
+      }
+
+      this.accessToken = data.token;
+      this.tokenExpiry = Date.now() + (data.expiresIn * 1000);
+      
+      return data.token;
+    } catch (error) {
+      console.error('Error getting access token:', error);
+      throw new Error('Failed to authenticate with PhonePe');
+    }
+  }
+
+  public async initiatePayment(request: PaymentRequest): Promise<PaymentResponse> {
+    try {
+      const accessToken = await this.getAccessToken();
+
+      // Prepare the payload
+      const payload = {
+        merchantId: this.config.merchantId,
+        merchantTransactionId: request.merchantOrderId,
+        merchantUserId: `USER_${Date.now()}`,
+        amount: request.amount,
+        redirectUrl: request.paymentFlow?.merchantUrls.redirectUrl || this.config.redirectUrl,
+        redirectMode: 'POST',
+        callbackUrl: request.paymentFlow?.merchantUrls.callbackUrl || this.config.callbackUrl,
+        mobileNumber: request.customer.phone,
+        paymentInstrument: {
+          type: 'PAY_PAGE',
+        },
+        metaInfo: request.metaInfo,
+        expiry: request.expireAfter
+          ? new Date(Date.now() + request.expireAfter * 1000).toISOString()
+          : new Date(Date.now() + 30 * 60 * 1000).toISOString(), // 30 minutes default
+      };
+
+      const response = await fetch(
+        `${this.config.apiBaseUrl}/apis/pg-sandbox/checkout/v2/pay`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken}`,
+            'X-VERIFY': this.generateXVerify(JSON.stringify(payload), '/apis/pg-sandbox/checkout/v2/pay'),
+          },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return {
+          success: false,
+          error: data.message || 'Failed to initiate payment',
+          code: data.code,
+        };
+      }
+
+      return {
+        success: true,
+        orderId: data.data.merchantOrderId,
+        state: 'PENDING',
+        redirectUrl: data.data.url,
+        expireAt: new Date(data.data.expiry).getTime(),
+      };
+    } catch (error) {
+      console.error('Error initiating payment:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to initiate payment',
+      };
+    }
+  }
+
+  public async checkPaymentStatus(merchantTransactionId: string): Promise<PaymentStatus> {
+    try {
+      const accessToken = await this.getAccessToken();
+      const path = `/apis/pg-sandbox/status/${this.config.merchantId}/${merchantTransactionId}`;
+
+      const response = await fetch(`${this.config.apiBaseUrl}${path}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+          'X-VERIFY': this.generateXVerify('', path),
+        },
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to check payment status');
+      }
+
+      return {
+        success: data.data.state === 'COMPLETED',
+        state: data.data.state,
+        transactionId: data.data.transactionId,
+        amount: data.data.amount / 100, // Convert from paise to currency
+        currency: data.data.currency,
+        timestamp: data.data.responseTimestamp,
+        message: data.message,
+        metadata: data.data,
+      };
+    } catch (error) {
+      console.error('Error checking payment status:', error);
+      throw new Error('Failed to check payment status: ' + (error instanceof Error ? error.message : 'Unknown error'));
+    }
+  }
+
+  public async initiateRefund(request: RefundRequest): Promise<RefundResponse> {
+    try {
+      const accessToken = await this.getAccessToken();
+      const path = `/apis/pg-sandbox/refund`;
+
+      const payload = {
+        merchantId: this.config.merchantId,
+        merchantTransactionId: request.merchantOrderId,
+        merchantUserId: `USER_${Date.now()}`,
+        originalTransactionId: request.transactionId,
+        amount: request.amount,
+        callbackUrl: this.config.callbackUrl,
+        reason: request.reason || 'Customer requested refund',
+      };
+
+      const response = await fetch(`${this.config.apiBaseUrl}${path}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+          'X-VERIFY': this.generateXVerify(JSON.stringify(payload), path),
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return {
+          success: false,
+          refundId: '',
+          state: 'FAILED',
+          amount: request.amount,
+          error: data.message || 'Failed to initiate refund',
+        };
+      }
+
+      return {
+        success: true,
+        refundId: data.data.refundId,
+        state: data.data.state,
+        amount: request.amount,
+        message: data.message,
+      };
+    } catch (error) {
+      console.error('Error initiating refund:', error);
+      return {
+        success: false,
+        refundId: '',
+        state: 'FAILED',
+        amount: request.amount,
+        error: error instanceof Error ? error.message : 'Failed to initiate refund',
+      };
+    }
+  }
+
+  public verifyWebhookSignature(payload: string, signature: string): boolean {
+    const calculatedSignature = this.generateXVerify(payload, '');
+    return calculatedSignature === signature;
+  }
 }

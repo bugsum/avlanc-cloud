@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { PaymentService } from "@/lib/payment/payment.service";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -50,13 +51,11 @@ export default function CheckoutPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate form
     if (cartItems.length === 0) {
       toast.error('Your cart is empty');
       return;
     }
-    
-    // Validate required fields
+  
     const requiredFields = ['name', 'email', 'phone', 'address', 'city', 'state', 'zip'];
     const missingFields = requiredFields.filter(field => !formData[field as keyof typeof formData]);
     
@@ -64,17 +63,13 @@ export default function CheckoutPage() {
       toast.error(`Please fill in all required fields: ${missingFields.join(', ')}`);
       return;
     }
-    
-    // Save form data to localStorage
+  
     localStorage.setItem('checkoutFormData', JSON.stringify(formData));
-    
     setIsProcessing(true);
     
     try {
-      // Generate a unique order ID
       const orderId = `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
       
-      // Prepare payment request
       const paymentRequest = {
         amount: totalAmount,
         orderId,
@@ -85,43 +80,27 @@ export default function CheckoutPage() {
           address: formData.address,
           city: formData.city,
           state: formData.state,
-          zip: formData.zip
+          zip: formData.zip,
         },
         items: cartItems.map(item => ({
           id: item.id,
           name: item.name,
           price: item.price,
-          quantity: item.quantity
+          quantity: item.quantity,
         })),
-        expireAfter: 300 // 5 minutes
+        expireAfter: 300, // 5 minutes
       };
-      
-      // Call the API to initiate payment
-      const response = await fetch('/api/payment', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(paymentRequest),
-      });
-      
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to initiate payment');
-      }
-      
-      if (data.redirectUrl) {
-        // Redirect to PhonePe payment page
-        window.location.href = data.redirectUrl;
-      } else {
-        throw new Error('No redirect URL received from payment gateway');
-      }
+  
+      const { redirectUrl } = await PaymentService.initiatePayment(paymentRequest);
+      window.location.href = redirectUrl as string;
+  
     } catch (error) {
       console.error('Payment error:', error);
       toast.error(error instanceof Error ? error.message : 'Failed to process payment');
     } finally {
-      setIsProcessing(false);
+      if (!window.location.href.includes('payment')) {
+        setIsProcessing(false);
+      }
     }
   };
 

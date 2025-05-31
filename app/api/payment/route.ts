@@ -1,28 +1,22 @@
 import { NextResponse } from 'next/server';
+import { PhonePeService } from '@/lib/phonepe.service';
+import { config } from '@/lib/config';
 
-// This ensures the route is handled by the serverless function
-export const dynamic = 'force-dynamic';
-
-// CORS headers
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS, GET',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   'Content-Type': 'application/json',
 };
 
-// Disable body parsing for webhook handling
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
+// Initialize PhonePe service
+const phonePeService = PhonePeService.getInstance(config.phonepe);
 
 export async function POST(request: Request) {
   try {
     const requestData = await request.json();
     
-    // Validate required fields
+    // Validate request data
     const requiredFields = ['amount', 'orderId', 'customer'];
     const missingFields = requiredFields.filter(field => !requestData[field]);
     
@@ -36,32 +30,46 @@ export async function POST(request: Request) {
       );
     }
 
-    // Validate customer fields
-    const requiredCustomerFields = ['email', 'phone'];
-    const missingCustomerFields = requiredCustomerFields.filter(
-      field => !requestData.customer?.[field]
-    );
-    
-    if (missingCustomerFields.length > 0) {
+    // Convert amount to paisa (PhonePe expects amount in paisa)
+    const amountInPaisa = Math.round(requestData.amount * 100);
+
+    // Process payment using PhonePe
+    const paymentResponse = await phonePeService.initiatePayment({
+      merchantOrderId: requestData.orderId,
+      amount: amountInPaisa,
+      customer: requestData.customer,
+      metaInfo: {
+        udf1: `Order ${requestData.orderId}`,
+        udf2: requestData.customer.email,
+        udf3: requestData.customer.phone,
+      },
+      paymentFlow: {
+        type: 'PG_CHECKOUT',
+        message: `Payment for order ${requestData.orderId}`,
+        merchantUrls: {
+          redirectUrl: `${config.app.url}/payment/callback`,
+          callbackUrl: `${config.app.url}/api/payment/webhook`,
+        },
+      },
+      expireAfter: 1800, // 30 minutes
+    });
+
+    if (!paymentResponse.success) {
       return NextResponse.json(
         { 
-          success: false,
-          error: `Missing required customer fields: ${missingCustomerFields.join(', ')}` 
+          success: false, 
+          error: paymentResponse.error || 'Failed to initiate payment',
+          code: paymentResponse.code,
         },
         { status: 400, headers: corsHeaders }
       );
     }
 
-    // TODO: Implement actual payment processing with your payment provider
-    // For example, with PhonePe, Razorpay, Stripe, etc.
-    
     return NextResponse.json(
       { 
         success: true, 
-        data: {
-          orderId: requestData.orderId,
-          // Add payment provider specific response here
-        } 
+        redirectUrl: paymentResponse.redirectUrl,
+        orderId: paymentResponse.orderId,
       },
       { status: 200, headers: corsHeaders }
     );
@@ -71,28 +79,14 @@ export async function POST(request: Request) {
     return NextResponse.json(
       { 
         success: false, 
-        error: error instanceof Error ? error.message : 'Failed to process payment request',
-        code: 'PAYMENT_PROCESSING_ERROR'
+        error: error instanceof Error ? error.message : 'Failed to process payment',
+        code: 'PAYMENT_PROCESSING_ERROR',
       },
       { status: 500, headers: corsHeaders }
     );
   }
 }
 
-export async function GET() {
-  return NextResponse.json(
-    { 
-      success: false, 
-      error: 'Method not allowed. Use POST to process payments.',
-      code: 'METHOD_NOT_ALLOWED'
-    },
-    { status: 405, headers: corsHeaders }
-  );
-}
-
 export async function OPTIONS() {
-  return new NextResponse(null, {
-    status: 204,
-    headers: corsHeaders
-  });
+  return NextResponse.json({}, { headers: corsHeaders });
 }
