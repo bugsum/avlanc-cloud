@@ -19,24 +19,35 @@ export class PhonePeService {
   }
 
   private generateXVerify(payload: string): string {
-    const data = payload + '/pg/v1/pay' + this.config.saltKey;
-    const sha256 = crypto.createHash('sha256').update(data).digest('hex');
-    return sha256 + '###' + this.config.saltIndex;
+    try {
+      const data = payload + '/pg/v1/pay' + this.config.saltKey;
+      console.log('Generating X-VERIFY for payload:', payload);
+      const sha256 = crypto.createHash('sha256').update(data).digest('hex');
+      const signature = sha256 + '###' + this.config.saltIndex;
+      console.log('Generated X-VERIFY:', signature);
+      return signature;
+    } catch (error) {
+      console.error('Error generating X-VERIFY:', error);
+      throw error;
+    }
   }
 
   private async getAccessToken(): Promise<string> {
     // Check if we have a valid token
     if (this.accessToken && Date.now() < this.tokenExpiry) {
+      console.log('Using existing access token');
       return this.accessToken;
     }
 
     try {
+      console.log('Requesting new access token...');
       const formData = new URLSearchParams();
       formData.append('client_id', this.config.clientId);
       formData.append('client_version', this.config.clientVersion);
       formData.append('client_secret', this.config.clientSecret);
       formData.append('grant_type', 'client_credentials');
 
+      console.log('Token request URL:', `${this.config.apiBaseUrl}/v1/oauth/token`);
       const response = await fetch(`${this.config.apiBaseUrl}/v1/oauth/token`, {
         method: 'POST',
         headers: {
@@ -46,6 +57,7 @@ export class PhonePeService {
       });
 
       const data = await response.json();
+      console.log('Token response:', JSON.stringify(data, null, 2));
 
       if (!response.ok || !data.access_token) {
         console.error('Authentication response:', data);
@@ -54,6 +66,7 @@ export class PhonePeService {
 
       this.accessToken = data.access_token;
       this.tokenExpiry = data.expires_at * 1000; // Convert to milliseconds
+      console.log('New access token obtained, expires at:', new Date(this.tokenExpiry).toISOString());
 
       return this.accessToken;
     } catch (error) {
@@ -64,9 +77,17 @@ export class PhonePeService {
 
   public async initiatePayment(request: PaymentRequest): Promise<PaymentResponse> {
     try {
+      console.log('Initiating payment with request:', JSON.stringify(request, null, 2));
       const accessToken = await this.getAccessToken();
       const payload = JSON.stringify(request);
       const xVerify = this.generateXVerify(payload);
+
+      console.log('Making payment request to:', `${this.config.apiBaseUrl}/pg/v1/pay`);
+      console.log('Request headers:', {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`,
+        'X-VERIFY': xVerify,
+      });
 
       const response = await fetch(`${this.config.apiBaseUrl}/pg/v1/pay`, {
         method: 'POST',
@@ -79,6 +100,7 @@ export class PhonePeService {
       });
 
       const data = await response.json();
+      console.log('Payment response:', JSON.stringify(data, null, 2));
 
       if (!response.ok) {
         throw new Error(data.message || 'Failed to initiate payment');
@@ -98,10 +120,12 @@ export class PhonePeService {
 
   public async checkPaymentStatus(merchantOrderId: string): Promise<PaymentStatus> {
     try {
+      console.log('Checking payment status for order:', merchantOrderId);
       const accessToken = await this.getAccessToken();
       const payload = `/pg/v1/status/${this.config.merchantId}/${merchantOrderId}`;
       const xVerify = this.generateXVerify(payload);
 
+      console.log('Making status request to:', `${this.config.apiBaseUrl}${payload}`);
       const response = await fetch(
         `${this.config.apiBaseUrl}${payload}`,
         {
@@ -115,6 +139,7 @@ export class PhonePeService {
       );
 
       const data = await response.json();
+      console.log('Status response:', JSON.stringify(data, null, 2));
 
       if (!response.ok) {
         throw new Error(data.message || 'Failed to check payment status');
@@ -129,9 +154,12 @@ export class PhonePeService {
 
   public verifyWebhookSignature(payload: string, signature: string): boolean {
     try {
+      console.log('Verifying webhook signature for payload:', payload);
       const data = payload + '/pg/v1/webhook' + this.config.saltKey;
       const sha256 = crypto.createHash('sha256').update(data).digest('hex');
       const expectedSignature = sha256 + '###' + this.config.saltIndex;
+      console.log('Expected signature:', expectedSignature);
+      console.log('Received signature:', signature);
       return signature === expectedSignature;
     } catch (error) {
       console.error('Error verifying webhook signature:', error);
