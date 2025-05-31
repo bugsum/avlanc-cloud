@@ -18,10 +18,11 @@ export class PhonePeService {
     return PhonePeService.instance;
   }
 
-  private generateXVerify(payload: string): string {
+  private generateXVerify(payload: string, endpoint: string): string {
     try {
-      const data = payload + '/pg/v1/pay' + this.config.saltKey;
+      const data = payload + endpoint + this.config.saltKey;
       console.log('Generating X-VERIFY for payload:', payload);
+      console.log('Endpoint:', endpoint);
       const sha256 = crypto.createHash('sha256').update(data).digest('hex');
       const signature = sha256 + '###' + this.config.saltIndex;
       console.log('Generated X-VERIFY:', signature);
@@ -41,19 +42,27 @@ export class PhonePeService {
 
     try {
       console.log('Requesting new access token...');
-      const formData = new URLSearchParams();
-      formData.append('client_id', this.config.clientId);
-      formData.append('client_version', this.config.clientVersion);
-      formData.append('client_secret', this.config.clientSecret);
-      formData.append('grant_type', 'client_credentials');
+      const payload = {
+        client_id: this.config.clientId,
+        client_secret: this.config.clientSecret,
+        client_version: this.config.clientVersion,
+        grant_type: 'client_credentials'
+      };
+
+      const payloadString = JSON.stringify(payload);
+      const xVerify = this.generateXVerify(payloadString, '/v1/oauth/token');
 
       console.log('Token request URL:', `${this.config.apiBaseUrl}/v1/oauth/token`);
+      console.log('Token request payload:', payloadString);
+      console.log('X-VERIFY:', xVerify);
+
       const response = await fetch(`${this.config.apiBaseUrl}/v1/oauth/token`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
+          'Content-Type': 'application/json',
+          'X-VERIFY': xVerify,
         },
-        body: formData,
+        body: payloadString,
       });
 
       const data = await response.json();
@@ -61,7 +70,7 @@ export class PhonePeService {
 
       if (!response.ok || !data.access_token) {
         console.error('Authentication response:', data);
-        throw new Error('Failed to authenticate with PhonePe');
+        throw new Error(`Failed to authenticate with PhonePe: ${data.message || 'Unknown error'}`);
       }
 
       this.accessToken = data.access_token;
@@ -71,7 +80,7 @@ export class PhonePeService {
       return this.accessToken;
     } catch (error) {
       console.error('Error getting access token:', error);
-      throw new Error('Failed to authenticate with PhonePe');
+      throw error;
     }
   }
 
@@ -80,7 +89,7 @@ export class PhonePeService {
       console.log('Initiating payment with request:', JSON.stringify(request, null, 2));
       const accessToken = await this.getAccessToken();
       const payload = JSON.stringify(request);
-      const xVerify = this.generateXVerify(payload);
+      const xVerify = this.generateXVerify(payload, '/pg/v1/pay');
 
       console.log('Making payment request to:', `${this.config.apiBaseUrl}/pg/v1/pay`);
       console.log('Request headers:', {
@@ -122,12 +131,12 @@ export class PhonePeService {
     try {
       console.log('Checking payment status for order:', merchantOrderId);
       const accessToken = await this.getAccessToken();
-      const payload = `/pg/v1/status/${this.config.merchantId}/${merchantOrderId}`;
-      const xVerify = this.generateXVerify(payload);
+      const endpoint = `/pg/v1/status/${this.config.merchantId}/${merchantOrderId}`;
+      const xVerify = this.generateXVerify('', endpoint);
 
-      console.log('Making status request to:', `${this.config.apiBaseUrl}${payload}`);
+      console.log('Making status request to:', `${this.config.apiBaseUrl}${endpoint}`);
       const response = await fetch(
-        `${this.config.apiBaseUrl}${payload}`,
+        `${this.config.apiBaseUrl}${endpoint}`,
         {
           method: 'GET',
           headers: {
