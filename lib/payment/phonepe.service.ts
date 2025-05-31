@@ -42,27 +42,26 @@ export class PhonePeService {
 
     try {
       console.log('Requesting new access token...');
-      const payload = {
-        client_id: this.config.clientId,
-        client_secret: this.config.clientSecret,
-        client_version: this.config.clientVersion,
-        grant_type: 'client_credentials'
-      };
+      const formData = new URLSearchParams();
+      formData.append('client_id', this.config.clientId);
+      formData.append('client_version', this.config.clientVersion);
+      formData.append('client_secret', this.config.clientSecret);
+      formData.append('grant_type', 'client_credentials');
 
-      const payloadString = JSON.stringify(payload);
-      const xVerify = this.generateXVerify(payloadString, '/v1/oauth/token');
+      // Use the identity manager URL for auth
+      const authUrl = this.config.apiBaseUrl.includes('preprod') 
+        ? 'https://api-preprod.phonepe.com/apis/pg-sandbox/v1/oauth/token'
+        : 'https://api.phonepe.com/apis/identity-manager/v1/oauth/token';
 
-      console.log('Token request URL:', `${this.config.apiBaseUrl}/v1/oauth/token`);
-      console.log('Token request payload:', payloadString);
-      console.log('X-VERIFY:', xVerify);
+      console.log('Token request URL:', authUrl);
+      console.log('Token request payload:', formData.toString());
 
-      const response = await fetch(`${this.config.apiBaseUrl}/v1/oauth/token`, {
+      const response = await fetch(authUrl, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'X-VERIFY': xVerify,
+          'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: payloadString,
+        body: formData,
       });
 
       const data = await response.json();
@@ -94,7 +93,7 @@ export class PhonePeService {
       console.log('Making payment request to:', `${this.config.apiBaseUrl}/pg/v1/pay`);
       console.log('Request headers:', {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${accessToken}`,
+        'Authorization': `O-Bearer ${accessToken}`,
         'X-VERIFY': xVerify,
       });
 
@@ -102,7 +101,7 @@ export class PhonePeService {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${accessToken}`,
+          'Authorization': `O-Bearer ${accessToken}`,
           'X-VERIFY': xVerify,
         },
         body: payload,
@@ -141,7 +140,7 @@ export class PhonePeService {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${accessToken}`,
+            'Authorization': `O-Bearer ${accessToken}`,
             'X-VERIFY': xVerify,
           },
         }
