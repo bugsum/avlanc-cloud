@@ -66,4 +66,23 @@ export interface PaymentStatus {
       bankTransactionId?: string;
     };
   };
+}
+
+// Helper type for payment status check response
+export interface PaymentStatusCheck {
+  success: boolean;
+  code: string;
+  message: string;
+  data: {
+    merchantTransactionId: string;
+    merchantOrderId: string;
+    amount: number;
+    state: 'PENDING' | 'COMPLETED' | 'FAILED';
+    responseCode: string;
+    paymentInstrument: {
+      type: string;
+      utr?: string;
+      bankTransactionId?: string;
+    };
+  };
 } 
