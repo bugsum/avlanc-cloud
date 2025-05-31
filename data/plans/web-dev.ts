@@ -4,7 +4,7 @@ export const webDevPlans: Plan[] = [
     {
         id: 'web-basic',
         title: 'Basic Website',
-        price: 1499,
+        price: 1,
         category: 'Web Development',
         description: 'Perfect for small businesses and individuals looking to establish their online presence with a simple, professional website.',
         features: [
