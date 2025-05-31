@@ -1,4 +1,4 @@
-import { PaymentStatus } from './phonepe';
+import { PaymentStatus } from './phonepe/types';
 
 /**
  * Format amount from paise to rupees

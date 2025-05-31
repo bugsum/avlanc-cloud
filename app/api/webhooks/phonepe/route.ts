@@ -1,73 +1,78 @@
 import { NextResponse } from 'next/server';
-import { processWebhook } from '@/lib/phonepe.service';
+import { PhonePeService } from '@/lib/phonepe/service';
+import { phonePeConfig } from '@/lib/config';
+import { WebhookPayload } from '@/lib/phonepe/types';
 
-// Disable body parsing, we need the raw body for signature verification
-export const config = {
-  api: {
-    bodyParser: false,
-  },
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, X-VERIFY',
+  'Content-Type': 'application/json',
 };
+
+// Initialize PhonePe service
+const phonePeService = PhonePeService.getInstance(phonePeConfig);
 
 export async function POST(request: Request) {
   try {
-    // Get the raw body as text for signature verification
-    const rawBody = await readRawBody(request);
-    if (!rawBody) {
-      console.error('Empty request body');
+    // Get the signature from headers
+    const signature = request.headers.get('X-VERIFY');
+    if (!signature) {
       return NextResponse.json(
-        { success: false, error: 'Empty request body' },
-        { status: 400 }
+        { success: false, error: 'Missing signature' },
+        { status: 401, headers: corsHeaders }
       );
     }
 
-    // Verify and process the webhook
-    const authHeader = request.headers.get('authorization') || '';
-    const result = await processWebhook(authHeader, JSON.parse(rawBody));
+    // Get the raw body for signature verification
+    const rawBody = await request.text();
+    const payload = JSON.parse(rawBody) as WebhookPayload;
 
-    if (!result.success) {
-      console.error('Webhook processing failed:', result.error);
+    // Verify the signature
+    if (!phonePeService.verifyWebhookSignature(rawBody, signature)) {
       return NextResponse.json(
-        { success: false, error: result.error },
-        { status: 401 }
+        { success: false, error: 'Invalid signature' },
+        { status: 401, headers: corsHeaders }
       );
     }
 
-    // Return success response to PhonePe
-    return NextResponse.json({ success: true });
+    // Process the webhook
+    console.log('Processing webhook:', {
+      merchantOrderId: payload.merchantOrderId,
+      transactionId: payload.transactionId,
+      amount: payload.amount,
+      state: payload.state,
+      paymentState: payload.paymentState,
+      paymentMessage: payload.paymentMessage,
+      paymentTime: payload.paymentTime ? new Date(payload.paymentTime).toISOString() : null,
+    });
+
+    // TODO: Update your database with the payment status
+    // This is where you would typically update your database with the payment status
+    // For example:
+    // await updatePaymentStatus(payload.merchantOrderId, {
+    //   transactionId: payload.transactionId,
+    //   status: payload.state,
+    //   amount: payload.amount,
+    //   paymentTime: payload.paymentTime ? new Date(payload.paymentTime) : new Date(),
+    //   paymentMessage: payload.paymentMessage,
+    //   paymentState: payload.paymentState,
+    //   rawResponse: rawBody,
+    // });
+
+    return NextResponse.json({ success: true }, { headers: corsHeaders });
   } catch (error) {
-    console.error('Error processing webhook:', error);
+    console.error('Webhook processing error:', error);
     return NextResponse.json(
       { 
         success: false, 
-        error: 'Internal server error',
-        details: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Failed to process webhook',
       },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     );
   }
 }
 
-// Helper function to read raw body from request
-async function readRawBody(request: Request): Promise<string | null> {
-  const chunks: Uint8Array[] = [];
-  const reader = request.body?.getReader();
-  
-  if (!reader) return null;
-  
-  try {
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      if (value) chunks.push(value);
-    }
-    
-    // Combine all chunks into a single buffer and convert to string
-    const buffer = Buffer.concat(chunks);
-    return buffer.toString('utf-8');
-  } catch (error) {
-    console.error('Error reading request body:', error);
-    return null;
-  } finally {
-    reader.releaseLock();
-  }
+export async function OPTIONS() {
+  return NextResponse.json({}, { headers: corsHeaders });
 }
