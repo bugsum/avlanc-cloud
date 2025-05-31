@@ -16,9 +16,6 @@ export class PhonePeService {
       apiBaseUrl: config.apiBaseUrl,
       redirectUrl: config.redirectUrl,
       callbackUrl: config.callbackUrl,
-      // Don't log sensitive data
-      saltKey: config.saltKey ? '***' : undefined,
-      saltIndex: config.saltIndex,
     });
   }
 
@@ -27,21 +24,6 @@ export class PhonePeService {
       PhonePeService.instance = new PhonePeService(config);
     }
     return PhonePeService.instance;
-  }
-
-  private generateXVerify(payload: string, endpoint: string): string {
-    try {
-      const data = payload + endpoint + this.config.saltKey;
-      console.log('Generating X-VERIFY for payload:', payload);
-      console.log('Endpoint:', endpoint);
-      const sha256 = crypto.createHash('sha256').update(data).digest('hex');
-      const signature = sha256 + '###' + this.config.saltIndex;
-      console.log('Generated X-VERIFY:', signature);
-      return signature;
-    } catch (error) {
-      console.error('Error generating X-VERIFY:', error);
-      throw error;
-    }
   }
 
   private async getAccessToken(): Promise<string> {
@@ -71,13 +53,6 @@ export class PhonePeService {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: {
-          client_id: this.config.clientId,
-          client_version: this.config.clientVersion,
-          grant_type: 'client_credentials',
-          // Don't log sensitive data
-          client_secret: this.config.clientSecret,
         },
       });
 
@@ -132,8 +107,6 @@ export class PhonePeService {
     try {
       console.log('Initiating payment with request:', JSON.stringify(request, null, 2));
       const accessToken = await this.getAccessToken();
-      const payload = JSON.stringify(request);
-      const xVerify = this.generateXVerify(payload, '/pg/v1/pay');
 
       const paymentUrl = `${this.config.apiBaseUrl}/pg/v1/pay`;
       console.log('Payment request details:', {
@@ -142,7 +115,6 @@ export class PhonePeService {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `O-Bearer ${accessToken.substring(0, 10)}...`,
-          'X-VERIFY': xVerify,
         },
         body: request,
       });
@@ -152,9 +124,8 @@ export class PhonePeService {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `O-Bearer ${accessToken}`,
-          'X-VERIFY': xVerify,
         },
-        body: payload,
+        body: JSON.stringify(request),
       });
 
       console.log('Payment response status:', response.status);
@@ -192,17 +163,14 @@ export class PhonePeService {
     try {
       console.log('Checking payment status for order:', merchantOrderId);
       const accessToken = await this.getAccessToken();
-      const endpoint = `/pg/v1/status/${this.config.merchantId}/${merchantOrderId}`;
-      const xVerify = this.generateXVerify('', endpoint);
 
-      const statusUrl = `${this.config.apiBaseUrl}${endpoint}`;
+      const statusUrl = `${this.config.apiBaseUrl}/pg/v1/status/${this.config.merchantId}/${merchantOrderId}`;
       console.log('Status request details:', {
         url: statusUrl,
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `O-Bearer ${accessToken.substring(0, 10)}...`,
-          'X-VERIFY': xVerify,
         },
       });
 
@@ -211,7 +179,6 @@ export class PhonePeService {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `O-Bearer ${accessToken}`,
-          'X-VERIFY': xVerify,
         },
       });
 
