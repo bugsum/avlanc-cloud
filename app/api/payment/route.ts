@@ -8,9 +8,7 @@ const corsHeaders = {
   'Content-Type': 'application/json',
 };
 
-// This tells Next.js to handle this route on the client side
-export const dynamic = 'force-dynamic';
-
+// For static export, we'll use a simpler approach
 // Handle OPTIONS method for CORS preflight
 export async function OPTIONS() {
   return new NextResponse(null, {
@@ -18,6 +16,9 @@ export async function OPTIONS() {
     headers: corsHeaders
   });
 }
+
+// This route will be statically exported
+export const dynamic = 'auto';
 
 export async function POST(request: Request) {
   try {
