@@ -6,6 +6,8 @@ export interface PhonePeConfig {
   apiBaseUrl: string;
   redirectUrl: string;
   callbackUrl: string;
+  saltKey: string;
+  saltIndex: number;
 }
 
 export interface PaymentRequest {

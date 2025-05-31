@@ -11,6 +11,8 @@ const phonePeService = PhonePeService.getInstance({
   apiBaseUrl: process.env.NEXT_PUBLIC_PHONEPE_API_BASE_URL!,
   redirectUrl: process.env.NEXT_PUBLIC_PHONEPE_REDIRECT_URL!,
   callbackUrl: process.env.NEXT_PUBLIC_PHONEPE_CALLBACK_URL!,
+  saltKey: process.env.PHONEPE_CLIENT_SECRET!,
+  saltIndex: parseInt(process.env.PHONEPE_CLIENT_VERSION || '1'),
 });
 
 export async function POST(request: NextRequest) {

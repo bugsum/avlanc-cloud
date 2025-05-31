@@ -1,4 +1,5 @@
 import { PhonePeConfig, PaymentRequest, PaymentResponse, PaymentStatus } from './types';
+import crypto from 'crypto';
 
 export class PhonePeService {
   private static instance: PhonePeService;
@@ -7,7 +8,11 @@ export class PhonePeService {
   private tokenExpiry: number = 0;
 
   private constructor(config: PhonePeConfig) {
-    this.config = config;
+    this.config = {
+      ...config,
+      saltKey: config.clientSecret,
+      saltIndex: parseInt(config.clientVersion),
+    };
     console.log('PhonePeService initialized with config:', {
       merchantId: config.merchantId,
       clientId: config.clientId,
@@ -123,6 +128,28 @@ export class PhonePeService {
     } catch (error) {
       console.error('Error checking payment status:', error);
       throw error;
+    }
+  }
+
+  public verifyWebhookSignature(payload: string, signature: string): boolean {
+    try {
+      console.log('Verifying webhook signature for payload:', payload);
+      const data = payload + '/pg/v1/webhook' + this.config.saltKey;
+      const sha256 = crypto.createHash('sha256').update(data).digest('hex');
+      const expectedSignature = sha256 + '###' + this.config.saltIndex;
+      console.log('Signature verification:', {
+        expected: expectedSignature,
+        received: signature,
+        matches: signature === expectedSignature,
+      });
+      return signature === expectedSignature;
+    } catch (error) {
+      console.error('Error verifying webhook signature:', {
+        name: error instanceof Error ? error.name : 'Unknown',
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined,
+      });
+      return false;
     }
   }
 } 
