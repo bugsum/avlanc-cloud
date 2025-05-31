@@ -2,11 +2,11 @@ import { NextResponse } from 'next/server';
 import { initiatePhonePePayment, checkPaymentStatus, PaymentRequest, PaymentStatus } from '@/lib/phonepe';
 import { v4 as uuidv4 } from 'uuid';
 
-// This route needs to be dynamic as it handles server-side operations
-export const dynamic = 'force-dynamic';
+// For static export, we'll need to handle payments client-side
+// In a production environment, you should use a serverless function for this
+// and set up proper CORS and authentication
 
-// Disable static generation for this route
-export const revalidate = 0;
+export const dynamic = 'auto'; // Let Next.js decide the best strategy
 
 
 // Handle OPTIONS method for CORS preflight
