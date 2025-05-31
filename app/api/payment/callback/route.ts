@@ -1,12 +1,40 @@
 import { NextResponse } from 'next/server';
 import { processWebhook } from '@/lib/phonepe.service';
 
+// Ensure this route is handled by the serverless function
+export const dynamic = 'force-dynamic';
+
 // Disable body parsing, we need the raw body
 export const config = {
   api: {
     bodyParser: false,
   },
 };
+
+// Helper function to read raw body from request
+async function readRawBody(request: Request): Promise<string | null> {
+  const chunks: Uint8Array[] = [];
+  const reader = request.body?.getReader();
+  
+  if (!reader) return null;
+  
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      if (value) chunks.push(value);
+    }
+    
+    // Combine all chunks into a single buffer and convert to string
+    const buffer = Buffer.concat(chunks);
+    return buffer.toString('utf-8');
+  } catch (error) {
+    console.error('Error reading request body:', error);
+    return null;
+  } finally {
+    reader.releaseLock();
+  }
+}
 
 export async function POST(request: Request) {
   try {
@@ -87,27 +115,4 @@ export async function POST(request: Request) {
   }
 }
 
-// Helper function to read raw body from request
-async function readRawBody(request: Request): Promise<string | null> {
-  const chunks: Uint8Array[] = [];
-  const reader = request.body?.getReader();
-  
-  if (!reader) return null;
-  
-  try {
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      if (value) chunks.push(value);
-    }
-    
-    // Combine all chunks into a single buffer and convert to string
-    const buffer = Buffer.concat(chunks);
-    return buffer.toString('utf-8');
-  } catch (error) {
-    console.error('Error reading request body:', error);
-    return null;
-  } finally {
-    reader.releaseLock();
-  }
-}
+

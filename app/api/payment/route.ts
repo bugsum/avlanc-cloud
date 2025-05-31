@@ -1,11 +1,21 @@
 import { NextResponse } from 'next/server';
 
+// This ensures the route is handled by the serverless function
+export const dynamic = 'force-dynamic';
+
 // CORS headers
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'POST, OPTIONS, GET',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   'Content-Type': 'application/json',
+};
+
+// Disable body parsing for webhook handling
+export const config = {
+  api: {
+    bodyParser: false,
+  },
 };
 
 export async function POST(request: Request) {
