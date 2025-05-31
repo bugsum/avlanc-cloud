@@ -1,26 +1,51 @@
-// This is a client-side only API route for static exports
-// For production, replace with a serverless function
-
 import { NextResponse } from 'next/server';
 
+// CORS headers configuration
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS, GET',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  'Content-Type': 'application/json',
+};
+
 // This tells Next.js to handle this route on the client side
-export const dynamic = 'force-static';
+export const dynamic = 'force-dynamic';
+
+// Handle OPTIONS method for CORS preflight
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: corsHeaders
+  });
+}
 
 export async function POST(request: Request) {
   try {
     // Parse request body
-    const requestData = await request.json();
+    let requestData;
+    try {
+      requestData = await request.json();
+    } catch (e) {
+      return new NextResponse(
+        JSON.stringify({ 
+          success: false, 
+          error: 'Invalid JSON in request body',
+          code: 'INVALID_JSON'
+        }),
+        { status: 400, headers: corsHeaders }
+      );
+    }
     
     // Validate required fields
     const requiredFields = ['amount', 'orderId', 'customer'];
     const missingFields = requiredFields.filter(field => !requestData[field]);
     
     if (missingFields.length > 0) {
-      return NextResponse.json(
-        { 
+      return new NextResponse(
+        JSON.stringify({ 
           success: false,
           error: `Missing required fields: ${missingFields.join(', ')}` 
-        },
+        }),
         { status: 400, headers: corsHeaders }
       );
     }
@@ -32,54 +57,36 @@ export async function POST(request: Request) {
     );
     
     if (missingCustomerFields.length > 0) {
-      return NextResponse.json(
-        { 
+      return new NextResponse(
+        JSON.stringify({ 
           success: false,
           error: `Missing required customer fields: ${missingCustomerFields.join(', ')}` 
-        },
+        }),
         { status: 400, headers: corsHeaders }
       );
     }
 
     // For static export, return a message indicating client-side processing is needed
-    return NextResponse.json(
-      { 
+    return new NextResponse(
+      JSON.stringify({ 
         success: false, 
         error: 'This API route is not available in static export. Please implement client-side payment processing.',
         code: 'CLIENT_SIDE_PROCESSING_REQUIRED'
-      },
+      }),
       { status: 501, headers: corsHeaders }
     );
 
   } catch (error) {
     console.error('Payment processing error:', error);
-    return NextResponse.json(
-      { 
+    return new NextResponse(
+      JSON.stringify({ 
         success: false, 
         error: error instanceof Error ? error.message : 'Failed to process payment request',
         code: 'PAYMENT_PROCESSING_ERROR'
-      },
+      }),
       { status: 500, headers: corsHeaders }
     );
   }
-}
-
-
-// The following code is kept for reference but won't be used in static export
-// CORS headers configuration
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-  'Content-Type': 'application/json',
-};
-
-// Handle OPTIONS method for CORS preflight
-export async function OPTIONS() {
-  return new NextResponse(null, {
-    status: 204,
-    headers: corsHeaders
-  });
 }
 
 // Payment processing implementation for server environments
