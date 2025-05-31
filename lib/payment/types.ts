@@ -3,6 +3,8 @@ export interface PhonePeConfig {
   clientId: string;
   clientSecret: string;
   clientVersion: string;
+  saltKey: string;
+  saltIndex: number;
   apiBaseUrl: string;
   redirectUrl: string;
   callbackUrl: string;

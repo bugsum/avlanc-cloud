@@ -1,4 +1,5 @@
 import { PhonePeConfig, PaymentRequest, PaymentResponse, PaymentStatus } from './types';
+import crypto from 'crypto';
 
 export class PhonePeService {
   private static instance: PhonePeService;
@@ -15,6 +16,12 @@ export class PhonePeService {
       PhonePeService.instance = new PhonePeService(config);
     }
     return PhonePeService.instance;
+  }
+
+  private generateXVerify(payload: string): string {
+    const data = payload + '/pg/v1/pay' + this.config.saltKey;
+    const sha256 = crypto.createHash('sha256').update(data).digest('hex');
+    return sha256 + '###' + this.config.saltIndex;
   }
 
   private async getAccessToken(): Promise<string> {
@@ -58,14 +65,17 @@ export class PhonePeService {
   public async initiatePayment(request: PaymentRequest): Promise<PaymentResponse> {
     try {
       const accessToken = await this.getAccessToken();
+      const payload = JSON.stringify(request);
+      const xVerify = this.generateXVerify(payload);
 
-      const response = await fetch(`${this.config.apiBaseUrl}/checkout/v2/pay`, {
+      const response = await fetch(`${this.config.apiBaseUrl}/pg/v1/pay`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `O-Bearer ${accessToken}`,
+          'Authorization': `Bearer ${accessToken}`,
+          'X-VERIFY': xVerify,
         },
-        body: JSON.stringify(request),
+        body: payload,
       });
 
       const data = await response.json();
@@ -89,14 +99,17 @@ export class PhonePeService {
   public async checkPaymentStatus(merchantOrderId: string): Promise<PaymentStatus> {
     try {
       const accessToken = await this.getAccessToken();
+      const payload = `/pg/v1/status/${this.config.merchantId}/${merchantOrderId}`;
+      const xVerify = this.generateXVerify(payload);
 
       const response = await fetch(
-        `${this.config.apiBaseUrl}/checkout/v2/order/${merchantOrderId}/status`,
+        `${this.config.apiBaseUrl}${payload}`,
         {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `O-Bearer ${accessToken}`,
+            'Authorization': `Bearer ${accessToken}`,
+            'X-VERIFY': xVerify,
           },
         }
       );
@@ -111,6 +124,18 @@ export class PhonePeService {
     } catch (error) {
       console.error('Error checking payment status:', error);
       throw error;
+    }
+  }
+
+  public verifyWebhookSignature(payload: string, signature: string): boolean {
+    try {
+      const data = payload + '/pg/v1/webhook' + this.config.saltKey;
+      const sha256 = crypto.createHash('sha256').update(data).digest('hex');
+      const expectedSignature = sha256 + '###' + this.config.saltIndex;
+      return signature === expectedSignature;
+    } catch (error) {
+      console.error('Error verifying webhook signature:', error);
+      return false;
     }
   }
 } 

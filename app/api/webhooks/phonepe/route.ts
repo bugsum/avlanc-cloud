@@ -4,6 +4,9 @@ import { PhonePeService } from '@/lib/payment/phonepe.service';
 // Initialize PhonePe service with configuration
 const phonePeService = PhonePeService.getInstance({
   merchantId: process.env.NEXT_PUBLIC_PHONEPE_MERCHANT_ID!,
+  clientId: process.env.PHONEPE_CLIENT_ID!,
+  clientSecret: process.env.PHONEPE_CLIENT_SECRET!,
+  clientVersion: process.env.PHONEPE_CLIENT_VERSION!,
   saltKey: process.env.PHONEPE_SALT_KEY!,
   saltIndex: parseInt(process.env.PHONEPE_SALT_INDEX || '1'),
   apiBaseUrl: process.env.NEXT_PUBLIC_PHONEPE_API_BASE_URL!,
