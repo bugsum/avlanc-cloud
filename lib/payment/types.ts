@@ -1,22 +1,31 @@
 export interface PaymentRequest {
-    amount: number;
-    orderId: string;
+    merchantOrderId: string;
+    amount: number; // in paise
     customer: {
-      name: string;
+      name?: string;
       email: string;
       phone: string;
-      address: string;
-      city: string;
-      state: string;
-      zip: string;
     };
-    items: Array<{
-      id: string;
-      name: string;
-      price: number;
-      quantity: number;
-    }>;
-    expireAfter?: number;
+    merchantUrls?: {
+      redirectUrl: string;
+      callbackUrl?: string;
+    };
+    expireAfter?: number; // in seconds
+    metaInfo?: {
+      items?: Array<{
+        id: string;
+        name: string;
+        price: number;
+        quantity: number;
+      }>;
+      shipping?: {
+        address: string;
+        city: string;
+        state: string;
+        zip: string;
+      };
+      [key: string]: any;
+    };
   }
   
   export interface PaymentResponse {

@@ -5,6 +5,8 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '';
 export class PaymentService {
   static async initiatePayment(request: PaymentRequest): Promise<PaymentResponse> {
     try {
+      console.log('Initiating payment with request:', request);
+      
       const response = await fetch(`${API_BASE_URL}/api/payment`, {
         method: 'POST',
         headers: {
@@ -14,6 +16,7 @@ export class PaymentService {
       });
 
       const data = await response.json();
+      console.log('Payment initiation response:', data);
 
       if (!response.ok) {
         throw new Error(data.error || 'Failed to initiate payment');

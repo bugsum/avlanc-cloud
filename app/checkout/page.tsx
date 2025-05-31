@@ -71,24 +71,32 @@ export default function CheckoutPage() {
       const orderId = `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
       
       const paymentRequest = {
-        amount: totalAmount,
-        orderId,
+        merchantOrderId: orderId,
+        amount: totalAmount * 100, // Convert to paise
         customer: {
           name: formData.name,
           email: formData.email,
           phone: formData.phone,
-          address: formData.address,
-          city: formData.city,
-          state: formData.state,
-          zip: formData.zip,
         },
-        items: cartItems.map(item => ({
-          id: item.id,
-          name: item.name,
-          price: item.price,
-          quantity: item.quantity,
-        })),
+        merchantUrls: {
+          redirectUrl: `${window.location.origin}/payment/success`,
+          callbackUrl: `${window.location.origin}/api/webhooks/phonepe`,
+        },
         expireAfter: 300, // 5 minutes
+        metaInfo: {
+          items: cartItems.map(item => ({
+            id: item.id,
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity,
+          })),
+          shipping: {
+            address: formData.address,
+            city: formData.city,
+            state: formData.state,
+            zip: formData.zip,
+          }
+        }
       };
   
       const { redirectUrl } = await PaymentService.initiatePayment(paymentRequest);
