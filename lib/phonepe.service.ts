@@ -6,31 +6,104 @@ const ENV = {
   MERCHANT_ID: process.env.PHONEPE_MERCHANT_ID!,
   SALT_KEY: process.env.PHONEPE_SALT_KEY!,
   SALT_INDEX: process.env.PHONEPE_SALT_INDEX || '1',
-  
+
   // API Endpoints
   API_BASE_URL: process.env.NODE_ENV === 'production'
     ? 'https://api.phonepe.com'
     : 'https://api-preprod.phonepe.com',
-  
+
   AUTH_URL: process.env.NODE_ENV === 'production'
     ? 'https://api.phonepe.com/apis/identity-manager/v1/oauth/token'
     : 'https://api-preprod.phonepe.com/apis/pg-sandbox/v1/oauth/token',
-  
+
   PAYMENT_URL: process.env.NODE_ENV === 'production'
     ? 'https://api.phonepe.com/apis/pg/checkout/v2/pay'
     : 'https://api-preprod.phonepe.com/apis/pg-sandbox/checkout/v2/pay',
-  
+
   // Webhook
   WEBHOOK_USERNAME: process.env.PHONEPE_WEBHOOK_USERNAME!,
   WEBHOOK_PASSWORD: process.env.PHONEPE_WEBHOOK_PASSWORD!,
-  
+
   // Application
   APP_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000',
   REDIRECT_URL: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/payment/callback`
 };
 
 // Types
-export type PaymentState = 'PENDING' | 'COMPLETED' | 'FAILED';
+export type PaymentState = 'PENDING' | 'COMPLETED' | 'FAILED' | 'CONFIRMED';
+export type RefundState = 'PENDING' | 'CONFIRMED' | 'COMPLETED' | 'FAILED';
+
+export interface OrderStatusResponse {
+  orderId: string;
+  state: PaymentState;
+  amount: number;
+  expireAt?: number;
+  paymentDetails?: Array<{
+    transactionId: string;
+    paymentMode: string;
+    timestamp: number;
+    amount: number;
+    state: PaymentState;
+    rail?: {
+      type: string;
+      utr?: string;
+      upiTransactionId?: string;
+      vpa?: string;
+    };
+    instrument?: {
+      type: string;
+      maskedAccountNumber?: string;
+      accountType?: string;
+    };
+    errorCode?: string;
+    detailedErrorCode?: string;
+  }>;
+  errorContext?: {
+    errorCode: string;
+    detailedErrorCode: string;
+    source: string;
+    stage: string;
+    description: string;
+  };
+}
+
+export interface RefundRequest {
+  merchantRefundId: string;
+  originalMerchantOrderId: string;
+  amount: number; // in paisa
+}
+
+export interface RefundResponse {
+  refundId: string;
+  amount: number;
+  state: RefundState;
+  errorCode?: string;
+  detailedErrorCode?: string;
+}
+
+export interface RefundStatusResponse {
+  originalMerchantOrderId: string;
+  amount: number;
+  state: RefundState;
+  timestamp: number;
+  refundId: string;
+  errorCode?: string;
+  detailedErrorCode?: string;
+  splitInstruments?: Array<{
+    amount: number;
+    rail?: {
+      type: string;
+      utr?: string;
+      upiTransactionId?: string;
+      vpa?: string;
+    };
+    instrument?: {
+      type: string;
+      maskedAccountNumber?: string;
+      accountType?: string;
+    };
+  }>;
+}
 
 export interface PaymentRequest {
   merchantOrderId: string;
@@ -75,6 +148,7 @@ export interface PaymentResponse {
   orderId?: string;
   state?: PaymentState;
   redirectUrl?: string;
+  tokenUrl?: string; // For iframe mode
   expireAt?: number;
   message?: string;
   error?: string;
@@ -142,7 +216,7 @@ async function getAccessToken(): Promise<string> {
     const data: TokenResponse = await response.json();
 
     console.log("Response", data)
-    
+
     // Cache the token
     tokenCache = {
       accessToken: data.access_token,
@@ -159,13 +233,16 @@ async function getAccessToken(): Promise<string> {
 /**
  * Initiates a PhonePe payment
  */
-export async function initiatePayment(request: PaymentRequest): Promise<PaymentResponse> {
+export async function initiatePayment(
+  request: PaymentRequest,
+  options: { mode?: 'REDIRECT' | 'IFRAME' } = { mode: 'REDIRECT' }
+): Promise<PaymentResponse> {
   try {
     const accessToken = await getAccessToken();
-    
+
     // Generate a unique merchant transaction ID if not provided
     const merchantTransactionId = request.merchantOrderId || `TXN_${Date.now()}`;
-    
+
     // Define the base payload with required fields
     const basePayload = {
       merchantId: ENV.MERCHANT_ID,
@@ -180,7 +257,7 @@ export async function initiatePayment(request: PaymentRequest): Promise<PaymentR
         type: 'PAY_PAGE' as const,
       },
       // Add default expiry time if not provided
-      expiry: request.expiresIn 
+      expiry: request.expiresIn
         ? new Date(Date.now() + request.expiresIn * 1000).toISOString()
         : new Date(Date.now() + 30 * 60 * 1000).toISOString(), // 30 minutes default
     };
@@ -189,62 +266,61 @@ export async function initiatePayment(request: PaymentRequest): Promise<PaymentR
     const payload = {
       ...basePayload,
       // Add payment flow if provided
-      ...(request.paymentFlow && { paymentFlow: request.paymentFlow }),
-      // Add customer details if provided
-      ...(request.customer && { customer: request.customer }),
-      // Add metadata if provided
-      ...(request.metadata && { metadata: request.metadata }),
-      // Add payment modes if provided
-      ...(request.paymentModes && request.paymentModes.length > 0 && { 
-        paymentModes: request.paymentModes 
-      })
     };
 
-    const response = await fetch(ENV.PAYMENT_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${accessToken}`,
-        'X-MERCHANT-ID': ENV.MERCHANT_ID,
-      },
-      body: JSON.stringify({
-        request: Buffer.from(JSON.stringify(payload)).toString('base64'),
-      }),
-    });
+    const response = await fetch(
+      `${ENV.API_BASE_URL}/apis/pg-sandbox/checkout/v2/pay`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `O-Bearer ${accessToken}`,
+          'X-CLIENT-ID': ENV.CLIENT_ID,
+          'X-CLIENT-SECRET': ENV.CLIENT_SECRET,
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+
+    const data = await response.json();
 
     if (!response.ok) {
-      const error = await response.text().catch(() => 'Failed to initiate payment');
-      throw new Error(`Payment initiation failed: ${response.status} - ${error}`);
+      return {
+        success: false,
+        error: data.message || 'Failed to initiate payment',
+        code: data.code,
+      };
     }
 
-    const responseData = await response.json();
-    
-    if (!responseData.success) {
-      throw new Error(responseData.message || 'Payment initiation failed');
+    // For iframe mode, we need to return the token URL directly
+    if (options.mode === 'IFRAME') {
+      return {
+        success: true,
+        orderId: data.data.merchantOrderId,
+        state: 'PENDING',
+        redirectUrl: data.data.url,
+        tokenUrl: data.data.url, // This is the URL to be used in iframe
+      };
     }
 
     return {
       success: true,
-      orderId: merchantTransactionId,
-      redirectUrl: responseData.data.instrumentResponse?.redirectInfo?.url,
-      state: 'PENDING' as const,
-      expireAt: Date.now() + (request.expiresIn || 30 * 60 * 1000), // Default 30 minutes
-      code: responseData.code,
-      message: responseData.message,
-    };
+      orderId: data.data.merchantOrderId,
+      state: 'PENDING',
+      redirectUrl: data.data.url,
+    }
   } catch (error) {
-    console.error('Error initiating payment:', error);
+    console.error('Error initiating refund:', error);
     return {
       success: false,
-      state: 'FAILED' as const,
-      error: error instanceof Error ? error.message : 'Failed to initiate payment',
-      code: 'PAYMENT_INITIATION_FAILED',
+      error: error instanceof Error ? error.message : 'Failed to initiate refund',
     };
   }
 }
 
 /**
- * Verifies webhook signature and processes the webhook payload
+ * Fetches the status of a refund
+ * @param merchantRefundId The merchant's refund ID
  */
 export async function processWebhook(
   authHeader: string | null,
@@ -271,12 +347,12 @@ export async function processWebhook(
 
     // Process the webhook based on payment state
     const { state, merchantOrderId, transactionId, amount } = payload;
-    
+
     // Log the webhook for debugging
-    console.log('Processing webhook:', { 
-      state, 
-      merchantOrderId, 
-      transactionId, 
+    console.log('Processing webhook:', {
+      state,
+      merchantOrderId,
+      transactionId,
       amount,
       paymentState: payload.paymentState,
       paymentMessage: payload.paymentMessage,
@@ -299,9 +375,9 @@ export async function processWebhook(
     return { success: true };
   } catch (error) {
     console.error('Webhook processing error:', error);
-    return { 
-      success: false, 
-      error: error instanceof Error ? error.message : 'Failed to process webhook' 
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to process webhook'
     };
   }
 }
