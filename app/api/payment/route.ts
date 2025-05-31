@@ -1,7 +1,26 @@
 import { NextResponse } from 'next/server';
 import { initiatePayment, createPaymentRequest } from '@/lib/phonepe.service';
 
+// Handle OPTIONS method for CORS preflight
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+};
+
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: corsHeaders
+  });
+}
+
 export async function POST(request: Request) {
+  // Set CORS headers
+  const headers = {
+    ...corsHeaders,
+    'Content-Type': 'application/json',
+  };
   try {
     const requestData = await request.json();
     
@@ -12,7 +31,7 @@ export async function POST(request: Request) {
     if (missingFields.length > 0) {
       return NextResponse.json(
         { error: `Missing required fields: ${missingFields.join(', ')}` },
-        { status: 400 }
+        { status: 400, headers }
       );
     }
 
@@ -24,8 +43,8 @@ export async function POST(request: Request) {
     
     if (missingCustomerFields.length > 0) {
       return NextResponse.json(
-        { error: `Missing customer details: ${missingCustomerFields.join(', ')}` },
-        { status: 400 }
+        { error: `Missing required customer fields: ${missingCustomerFields.join(', ')}` },
+        { status: 400, headers }
       );
     }
 
@@ -90,7 +109,7 @@ export async function POST(request: Request) {
           error: response.error || 'Failed to initiate payment',
           code: response.code,
         },
-        { status: response.code === 'BAD_REQUEST' ? 400 : 500 }
+        { status: response.code === 'BAD_REQUEST' ? 400 : 500, headers }
       );
     }
 
@@ -100,17 +119,15 @@ export async function POST(request: Request) {
       redirectUrl: response.redirectUrl,
       expireAt: response.expireAt,
       message: 'Payment initiated successfully',
-    });
+    }, { headers });
 
   } catch (error) {
     console.error('Payment initiation error:', error);
     return NextResponse.json(
       { 
-        success: false,
-        error: 'Internal server error',
-        details: error instanceof Error ? error.message : 'Unknown error',
+        error: error instanceof Error ? error.message : 'An error occurred' 
       },
-      { status: 500 }
+      { status: 500, headers }
     );
   }
 }
