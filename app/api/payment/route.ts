@@ -1,115 +1,43 @@
-import { NextResponse } from 'next/server';
-import { PhonePeService } from '@/lib/phonepe/service';
-import { phonePeConfig } from '@/lib/config';
-import { PaymentRequest } from '@/lib/phonepe/types';
+import { NextRequest, NextResponse } from 'next/server';
+import { PhonePeService } from '@/lib/payment/phonepe.service';
+import { PaymentRequest } from '@/lib/payment/types';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type',
-  'Content-Type': 'application/json',
-};
+// Initialize PhonePe service with configuration
+const phonePeService = PhonePeService.getInstance({
+  merchantId: process.env.NEXT_PUBLIC_PHONEPE_MERCHANT_ID!,
+  clientId: process.env.PHONEPE_CLIENT_ID!,
+  clientSecret: process.env.PHONEPE_CLIENT_SECRET!,
+  clientVersion: process.env.PHONEPE_CLIENT_VERSION!,
+  apiBaseUrl: process.env.NEXT_PUBLIC_PHONEPE_API_BASE_URL!,
+  redirectUrl: process.env.NEXT_PUBLIC_PHONEPE_REDIRECT_URL!,
+  callbackUrl: process.env.NEXT_PUBLIC_PHONEPE_CALLBACK_URL!,
+});
 
-// Initialize PhonePe service
-const phonePeService = PhonePeService.getInstance(phonePeConfig);
-
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const body = await request.json() as PaymentRequest;
-    
-    console.log('Received payment request:', {
+    const body = await request.json();
+    const paymentRequest: PaymentRequest = {
       merchantOrderId: body.merchantOrderId,
       amount: body.amount,
-      customer: {
-        name: body.customer?.name,
-        email: body.customer?.email,
-        phone: body.customer?.phone,
+      expireAfter: body.expireAfter,
+      metaInfo: body.metaInfo,
+      paymentFlow: {
+        type: 'PG_CHECKOUT',
+        message: body.message,
+        merchantUrls: {
+          redirectUrl: body.merchantUrls?.redirectUrl,
+        },
+        paymentModeConfig: body.paymentModeConfig,
       },
-      merchantUrls: body.merchantUrls,
-    });
+    };
 
-    // Validate required fields
-    const missingFields = [];
-    if (!body.merchantOrderId) missingFields.push('merchantOrderId');
-    if (!body.amount) missingFields.push('amount');
-    if (!body.customer?.phone) missingFields.push('customer.phone');
-    if (!body.customer?.email) missingFields.push('customer.email');
-
-    if (missingFields.length > 0) {
-      console.error('Missing required fields:', missingFields);
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Missing required fields',
-          missingFields,
-        },
-        { status: 400, headers: corsHeaders }
-      );
-    }
-
-    // Validate amount is positive
-    if (body.amount <= 0) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Amount must be greater than 0',
-        },
-        { status: 400, headers: corsHeaders }
-      );
-    }
-
-    // Validate phone number format (basic validation)
-    const phoneRegex = /^[6-9]\d{9}$/;
-    if (!phoneRegex.test(body.customer.phone)) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Invalid phone number format',
-        },
-        { status: 400, headers: corsHeaders }
-      );
-    }
-
-    // Validate email format (basic validation)
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(body.customer.email)) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Invalid email format',
-        },
-        { status: 400, headers: corsHeaders }
-      );
-    }
-
-    const response = await phonePeService.initiatePayment(body);
-
-    if (!response.success) {
-      console.error('Payment initiation failed:', response.error);
-      return NextResponse.json(
-        { success: false, error: response.error },
-        { status: 400, headers: corsHeaders }
-      );
-    }
-
-    console.log('Payment initiated successfully:', {
-      orderId: response.orderId,
-      redirectUrl: response.redirectUrl,
-    });
-
-    return NextResponse.json(response, { headers: corsHeaders });
+    const response = await phonePeService.initiatePayment(paymentRequest);
+    return NextResponse.json(response);
   } catch (error) {
-    console.error('Payment API error:', error);
+    console.error('Error processing payment request:', error);
     return NextResponse.json(
-      { 
-        success: false, 
-        error: error instanceof Error ? error.message : 'Failed to process payment request',
-      },
-      { status: 500, headers: corsHeaders }
+      { error: 'Failed to process payment request' },
+      { status: 500 }
     );
   }
-}
-
-export async function OPTIONS() {
-  return NextResponse.json({}, { headers: corsHeaders });
-}
+} 

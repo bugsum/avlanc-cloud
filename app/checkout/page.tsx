@@ -9,15 +9,23 @@ import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { PaymentService } from "@/lib/payment/payment.service";
+
+interface CheckoutFormData {
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+  city: string;
+  state: string;
+  zip: string;
+}
 
 export default function CheckoutPage() {
   const router = useRouter();
   const { cartItems, removeFromCart, clearCart } = useCart();
   const [totalAmount, setTotalAmount] = useState(0);
   const [isProcessing, setIsProcessing] = useState(false);
-  
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<CheckoutFormData>({
     name: "",
     email: "",
     phone: "",
@@ -26,6 +34,8 @@ export default function CheckoutPage() {
     state: "",
     zip: "",
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   
   // Load saved form data from localStorage if available
   useEffect(() => {
@@ -50,7 +60,9 @@ export default function CheckoutPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+    setLoading(true);
+    setError(null);
+
     if (cartItems.length === 0) {
       toast.error('Your cart is empty');
       return;
@@ -68,47 +80,42 @@ export default function CheckoutPage() {
     setIsProcessing(true);
     
     try {
-      const orderId = `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-      
-      const paymentRequest = {
-        merchantOrderId: orderId,
-        amount: totalAmount * 100, // Convert to paise
-        customer: {
-          name: formData.name,
-          email: formData.email,
-          phone: formData.phone,
+      const response = await fetch('/api/payment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-        merchantUrls: {
-          redirectUrl: `${window.location.origin}/payment/success`,
-          callbackUrl: `${window.location.origin}/api/webhooks/phonepe`,
-        },
-        expireAfter: 300, // 5 minutes
-        metaInfo: {
-          items: cartItems.map(item => ({
-            id: item.id,
-            name: item.name,
-            price: item.price,
-            quantity: item.quantity,
-          })),
-          shipping: {
-            address: formData.address,
-            city: formData.city,
-            state: formData.state,
-            zip: formData.zip,
-          }
-        }
-      };
-  
-      const { redirectUrl } = await PaymentService.initiatePayment(paymentRequest);
-      window.location.href = redirectUrl as string;
-  
-    } catch (error) {
-      console.error('Payment error:', error);
-      toast.error(error instanceof Error ? error.message : 'Failed to process payment');
-    } finally {
-      if (!window.location.href.includes('payment')) {
-        setIsProcessing(false);
+        body: JSON.stringify({
+          merchantOrderId: `ORDER_${Date.now()}`,
+          amount: 100, // Amount in paise (₹1 = 100 paise)
+          customer: formData,
+          merchantUrls: {
+            redirectUrl: `${window.location.origin}/payment/success`,
+            callbackUrl: `${window.location.origin}/api/webhooks/phonepe`,
+          },
+          metaInfo: {
+            productId: 'PROD_123',
+            productName: 'Sample Product',
+          },
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to initiate payment');
       }
+
+      if (data.success && data.redirectUrl) {
+        window.location.href = data.redirectUrl;
+      } else {
+        throw new Error('Invalid payment response');
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong');
+    } finally {
+      setIsProcessing(false);
+      setLoading(false);
     }
   };
 
@@ -180,6 +187,11 @@ export default function CheckoutPage() {
             <CardTitle>Shipping Information</CardTitle>
           </CardHeader>
           <CardContent>
+            {error && (
+              <div className="mb-4 p-4 bg-red-50 text-red-700 rounded-md">
+                {error}
+              </div>
+            )}
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <Label htmlFor="name">Full Name</Label>
@@ -258,19 +270,19 @@ export default function CheckoutPage() {
               <Button 
                 type="submit" 
                 className="w-full"
-                disabled={isProcessing || cartItems.length === 0}
+                disabled={loading || cartItems.length === 0}
               >
-                {isProcessing ? (
+                {loading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Processing...
                   </>
                 ) : (
-                  'Proceed to Payment'
+                  'Pay with PhonePe'
                 )}
               </Button>
               <p className="text-xs text-muted-foreground text-center mt-2">
-                You will be redirected to PhonePe's secure payment page to complete your purchase.
+                Payment integration coming soon.
               </p>
             </form>
           </CardContent>

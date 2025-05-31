@@ -1,42 +1,105 @@
+export interface PhonePeConfig {
+  merchantId: string;
+  clientId: string;
+  clientSecret: string;
+  clientVersion: string;
+  apiBaseUrl: string;
+  redirectUrl: string;
+  callbackUrl: string;
+}
+
 export interface PaymentRequest {
-    merchantOrderId: string;
-    amount: number; // in paise
-    customer: {
-      name?: string;
-      email: string;
-      phone: string;
-    };
-    merchantUrls?: {
+  merchantOrderId: string;
+  amount: number; // in paise
+  expireAfter?: number; // in seconds, default 1200 (20 mins)
+  metaInfo?: {
+    udf1?: string;
+    udf2?: string;
+    udf3?: string;
+    udf4?: string;
+    udf5?: string;
+    [key: string]: any;
+  };
+  paymentFlow: {
+    type: 'PG_CHECKOUT';
+    message?: string;
+    merchantUrls: {
       redirectUrl: string;
-      callbackUrl?: string;
     };
-    expireAfter?: number; // in seconds
-    metaInfo?: {
-      items?: Array<{
-        id: string;
-        name: string;
-        price: number;
-        quantity: number;
+    paymentModeConfig?: {
+      enabledPaymentModes?: Array<{
+        type: 'UPI_INTENT' | 'UPI_COLLECT' | 'UPI_QR' | 'NET_BANKING' | 'CARD';
+        cardTypes?: Array<'DEBIT_CARD' | 'CREDIT_CARD'>;
       }>;
-      shipping?: {
-        address: string;
-        city: string;
-        state: string;
-        zip: string;
-      };
-      [key: string]: any;
+      disabledPaymentModes?: Array<{
+        type: 'UPI_INTENT' | 'UPI_COLLECT' | 'UPI_QR' | 'NET_BANKING' | 'CARD';
+        cardTypes?: Array<'DEBIT_CARD' | 'CREDIT_CARD'>;
+      }>;
     };
-  }
-  
-  export interface PaymentResponse {
-    success: boolean;
-    redirectUrl?: string;
-    orderId?: string;
-    error?: string;
-    code?: string;
-  }
-  
-  export interface PaymentError extends Error {
-    code?: string;
-    details?: any;
-  }
+  };
+}
+
+export interface PaymentResponse {
+  orderId: string;
+  state: PaymentState;
+  expireAt: number;
+  redirectUrl: string;
+}
+
+export type PaymentState = 'PENDING' | 'COMPLETED' | 'FAILED';
+
+export interface PaymentStatus {
+  orderId: string;
+  state: PaymentState;
+  amount: number;
+  expireAt: number;
+  metaInfo?: {
+    udf1?: string;
+    udf2?: string;
+    udf3?: string;
+    udf4?: string;
+    udf5?: string;
+  };
+  paymentDetails: Array<{
+    paymentMode: 'UPI_INTENT' | 'UPI_COLLECT' | 'UPI_QR' | 'NET_BANKING' | 'CARD';
+    transactionId: string;
+    timestamp: number;
+    amount: number;
+    state: PaymentState;
+    errorCode?: string;
+    detailedErrorCode?: string;
+    rail?: {
+      type: 'UPI' | 'PG';
+      utr?: string;
+      upiTransactionId?: string;
+      vpa?: string;
+    };
+    instrument?: {
+      type: 'ACCOUNT' | 'CREDIT_CARD' | 'DEBIT_CARD' | 'NET_BANKING';
+      maskedAccountNumber?: string;
+      accountType?: string;
+      accountHolderName?: string;
+    };
+    splitInstruments?: Array<{
+      amount: number;
+      rail: {
+        type: 'UPI' | 'PG' | 'PPI_WALLET';
+        utr?: string;
+        upiTransactionId?: string;
+        vpa?: string;
+      };
+      instrument: {
+        type: 'ACCOUNT' | 'CREDIT_CARD' | 'DEBIT_CARD' | 'NET_BANKING' | 'WALLET';
+        maskedAccountNumber?: string;
+        accountType?: string;
+      };
+    }>;
+  }>;
+  errorContext?: {
+    errorCode: string;
+    detailedErrorCode: string;
+    source: string;
+    stage: string;
+    description: string;
+  };
+} 

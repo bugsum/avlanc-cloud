@@ -1,5 +1,3 @@
-import { PaymentStatus } from './phonepe/types';
-
 /**
  * Format amount from paise to rupees
  * @param amountInPaise Amount in paise
@@ -29,11 +27,13 @@ export const formatDate = (timestamp: number): string => {
  * @param status Payment status
  * @returns Tailwind CSS color class
  */
-export const getStatusBadgeColor = (status: PaymentStatus['state']): string => {
-  switch (status) {
+export const getStatusBadgeColor = (status: string): string => {
+  switch (status.toUpperCase()) {
     case 'COMPLETED':
+    case 'SUCCESS':
       return 'bg-green-100 text-green-800';
     case 'FAILED':
+    case 'ERROR':
       return 'bg-red-100 text-red-800';
     case 'PENDING':
       return 'bg-yellow-100 text-yellow-800';
@@ -47,11 +47,13 @@ export const getStatusBadgeColor = (status: PaymentStatus['state']): string => {
  * @param status Payment status
  * @returns Human-readable status text
  */
-export const getStatusText = (status: PaymentStatus['state']): string => {
-  switch (status) {
+export const getStatusText = (status: string): string => {
+  switch (status.toUpperCase()) {
     case 'COMPLETED':
+    case 'SUCCESS':
       return 'Completed';
     case 'FAILED':
+    case 'ERROR':
       return 'Failed';
     case 'PENDING':
       return 'Pending';

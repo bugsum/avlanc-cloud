@@ -1,78 +1,49 @@
-import { NextResponse } from 'next/server';
-import { PhonePeService } from '@/lib/phonepe/service';
-import { phonePeConfig } from '@/lib/config';
-import { WebhookPayload } from '@/lib/phonepe/types';
+import { NextRequest, NextResponse } from 'next/server';
+import { PhonePeService } from '@/lib/payment/phonepe.service';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, X-VERIFY',
-  'Content-Type': 'application/json',
-};
+// Initialize PhonePe service with configuration
+const phonePeService = PhonePeService.getInstance({
+  merchantId: process.env.NEXT_PUBLIC_PHONEPE_MERCHANT_ID!,
+  saltKey: process.env.PHONEPE_SALT_KEY!,
+  saltIndex: parseInt(process.env.PHONEPE_SALT_INDEX || '1'),
+  apiBaseUrl: process.env.NEXT_PUBLIC_PHONEPE_API_BASE_URL!,
+  redirectUrl: process.env.NEXT_PUBLIC_PHONEPE_REDIRECT_URL!,
+  callbackUrl: process.env.NEXT_PUBLIC_PHONEPE_CALLBACK_URL!,
+});
 
-// Initialize PhonePe service
-const phonePeService = PhonePeService.getInstance(phonePeConfig);
-
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    // Get the signature from headers
-    const signature = request.headers.get('X-VERIFY');
+    const signature = request.headers.get('x-verify');
     if (!signature) {
       return NextResponse.json(
-        { success: false, error: 'Missing signature' },
-        { status: 401, headers: corsHeaders }
+        { error: 'Missing signature' },
+        { status: 400 }
       );
     }
 
-    // Get the raw body for signature verification
-    const rawBody = await request.text();
-    const payload = JSON.parse(rawBody) as WebhookPayload;
+    const payload = await request.text();
+    const isValid = phonePeService.verifyWebhookSignature(payload, signature);
 
-    // Verify the signature
-    if (!phonePeService.verifyWebhookSignature(rawBody, signature)) {
+    if (!isValid) {
       return NextResponse.json(
-        { success: false, error: 'Invalid signature' },
-        { status: 401, headers: corsHeaders }
+        { error: 'Invalid signature' },
+        { status: 400 }
       );
     }
 
-    // Process the webhook
-    console.log('Processing webhook:', {
-      merchantOrderId: payload.merchantOrderId,
-      transactionId: payload.transactionId,
-      amount: payload.amount,
-      state: payload.state,
-      paymentState: payload.paymentState,
-      paymentMessage: payload.paymentMessage,
-      paymentTime: payload.paymentTime ? new Date(payload.paymentTime).toISOString() : null,
-    });
+    const data = JSON.parse(payload);
+    console.log('Received webhook:', data);
 
     // TODO: Update your database with the payment status
-    // This is where you would typically update your database with the payment status
-    // For example:
-    // await updatePaymentStatus(payload.merchantOrderId, {
-    //   transactionId: payload.transactionId,
-    //   status: payload.state,
-    //   amount: payload.amount,
-    //   paymentTime: payload.paymentTime ? new Date(payload.paymentTime) : new Date(),
-    //   paymentMessage: payload.paymentMessage,
-    //   paymentState: payload.paymentState,
-    //   rawResponse: rawBody,
-    // });
+    // const paymentStatus = await phonePeService.checkPaymentStatus(data.merchantTransactionId);
+    // await updatePaymentInDatabase(data.merchantTransactionId, paymentStatus);
 
-    return NextResponse.json({ success: true }, { headers: corsHeaders });
+    return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Webhook processing error:', error);
+    console.error('Error processing webhook:', error);
     return NextResponse.json(
-      { 
-        success: false, 
-        error: error instanceof Error ? error.message : 'Failed to process webhook',
-      },
-      { status: 500, headers: corsHeaders }
+      { error: 'Failed to process webhook' },
+      { status: 500 }
     );
   }
-}
-
-export async function OPTIONS() {
-  return NextResponse.json({}, { headers: corsHeaders });
-}
+} 
