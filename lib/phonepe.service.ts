@@ -25,7 +25,7 @@ const ENV = {
   WEBHOOK_PASSWORD: process.env.PHONEPE_WEBHOOK_PASSWORD!,
 
   // Application
-  APP_BASE_URL: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+  APP_BASE_URL: process.env.NEXT_PUBLIC_APP_URL || 'https://avlanc.com',
   REDIRECT_URL: process.env.NEXT_PUBLIC_PHONEPE_REDIRECT_URL || '',
   CALLBACK_URL: process.env.NEXT_PUBLIC_PHONEPE_CALLBACK_URL || '',
 };
@@ -180,7 +180,7 @@ let tokenCache: {
 } | null = null;
 
 /**
- * Fetches a new access token from PhonePe OAuth2 endpoint
+ * Fetches a new access token from our server-side auth endpoint
  */
 async function getAccessToken(): Promise<string> {
   // Return cached token if it's still valid
@@ -189,18 +189,11 @@ async function getAccessToken(): Promise<string> {
   }
 
   try {
-    const formData = new URLSearchParams();
-    formData.append('client_id', ENV.CLIENT_ID);
-    formData.append('client_secret', ENV.CLIENT_SECRET);
-    formData.append('grant_type', 'client_credentials');
-    formData.append('client_version', ENV.SALT_INDEX);
-
-    const response = await fetch(ENV.AUTH_URL, {
+    const response = await fetch(`${ENV.APP_BASE_URL}/api/payment/auth`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Type': 'application/json',
       },
-      body: formData.toString(),
     });
 
     if (!response.ok) {
@@ -208,14 +201,16 @@ async function getAccessToken(): Promise<string> {
       throw new Error(`Failed to get access token: ${response.status} - ${error}`);
     }
 
-    const data: TokenResponse = await response.json();
+    const data = await response.json();
 
-    console.log("Response", data)
+    if (!data.success || !data.token) {
+      throw new Error(data.error || 'Failed to get access token');
+    }
 
     // Cache the token
     tokenCache = {
-      accessToken: data.access_token,
-      expiresAt: data.expires_at * 1000, // Convert to milliseconds
+      accessToken: data.token,
+      expiresAt: Date.now() + (data.expiresIn * 1000), // Convert to milliseconds
     };
 
     return tokenCache.accessToken;
@@ -233,7 +228,9 @@ export async function initiatePayment(
   options: { mode?: 'REDIRECT' | 'IFRAME' } = { mode: 'REDIRECT' }
 ): Promise<PaymentResponse> {
   try {
+    console.log('Starting payment initiation...');
     const accessToken = await getAccessToken();
+    console.log('Got access token');
 
     // Generate a unique merchant transaction ID if not provided
     const merchantTransactionId = request.merchantOrderId || `TXN_${Date.now()}`;
@@ -246,7 +243,7 @@ export async function initiatePayment(
       amount: request.amount,
       redirectUrl: request.merchantUrls?.redirectUrl || ENV.REDIRECT_URL,
       redirectMode: 'POST' as const,
-      callbackUrl: request.merchantUrls?.callbackUrl || ENV.REDIRECT_URL,
+      callbackUrl: request.merchantUrls?.callbackUrl || ENV.CALLBACK_URL,
       mobileNumber: request.customer?.phone,
       paymentInstrument: {
         type: 'PAY_PAGE' as const,
@@ -257,29 +254,37 @@ export async function initiatePayment(
         : new Date(Date.now() + 30 * 60 * 1000).toISOString(), // 30 minutes default
     };
 
-    // Create the full payload with optional fields
-    const payload = {
+    console.log('Payment payload:', {
       ...basePayload,
-      // Add payment flow if provided
-    };
+      // Don't log sensitive data
+      merchantId: basePayload.merchantId,
+      amount: basePayload.amount,
+      redirectUrl: basePayload.redirectUrl,
+      callbackUrl: basePayload.callbackUrl,
+    });
 
-    const response = await fetch(
-      `${ENV.API_BASE_URL}/apis/pg-sandbox/checkout/v2/pay`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `O-Bearer ${accessToken}`,
-          'X-CLIENT-ID': ENV.CLIENT_ID,
-          'X-CLIENT-SECRET': ENV.CLIENT_SECRET,
-        },
-        body: JSON.stringify(payload),
-      }
-    );
+    const paymentUrl = `${ENV.API_BASE_URL}/apis/pg-sandbox/checkout/v2/pay`;
+    console.log('Payment URL:', paymentUrl);
 
+    const response = await fetch(paymentUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify(basePayload),
+    });
+
+    console.log('Payment response status:', response.status);
     const data = await response.json();
+    console.log('Payment response data:', data);
 
     if (!response.ok) {
+      console.error('Payment initiation failed:', {
+        status: response.status,
+        statusText: response.statusText,
+        data: data
+      });
       return {
         success: false,
         error: data.message || 'Failed to initiate payment',
@@ -303,12 +308,12 @@ export async function initiatePayment(
       orderId: data.data.merchantOrderId,
       state: 'PENDING',
       redirectUrl: data.data.url,
-    }
+    };
   } catch (error) {
-    console.error('Error initiating refund:', error);
+    console.error('Error initiating payment:', error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to initiate refund',
+      error: error instanceof Error ? error.message : 'Failed to initiate payment',
     };
   }
 }

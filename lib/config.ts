@@ -1,11 +1,8 @@
 export const config = {
   phonepe: {
+    // Public config (safe to expose to browser)
     merchantId: process.env.NEXT_PUBLIC_PHONEPE_MERCHANT_ID || '',
-    clientId: process.env.NEXT_PUBLIC_PHONEPE_CLIENT_ID || '',
-    clientSecret: process.env.NEXT_PUBLIC_PHONEPE_CLIENT_SECRET || '',
-    saltKey: process.env.NEXT_PUBLIC_PHONEPE_SALT_KEY || '',
-    saltIndex: parseInt(process.env.NEXT_PUBLIC_PHONEPE_SALT_INDEX || '1', 10),
-    apiBaseUrl: process.env.NEXT_PUBLIC_PHONEPE_API_BASE_URL || 'https://api.phonepe.com',
+    apiBaseUrl: process.env.NEXT_PUBLIC_PHONEPE_API_BASE_URL || 'https://api-preprod.phonepe.com',
     redirectUrl: process.env.NEXT_PUBLIC_PHONEPE_REDIRECT_URL || '',
     callbackUrl: process.env.NEXT_PUBLIC_PHONEPE_CALLBACK_URL || '',
   },
@@ -14,18 +11,41 @@ export const config = {
   },
 } as const;
 
+// Server-side config (not exposed to browser)
+export const serverConfig = {
+  phonepe: {
+    clientId: process.env.PHONEPE_CLIENT_ID || '',
+    clientSecret: process.env.PHONEPE_CLIENT_SECRET || '',
+    saltKey: process.env.PHONEPE_SALT_KEY || '',
+    saltIndex: parseInt(process.env.PHONEPE_SALT_INDEX || '1', 10),
+  },
+} as const;
+
 // Validate required configuration
-const requiredEnvVars = [
+const requiredPublicEnvVars = [
   'NEXT_PUBLIC_PHONEPE_MERCHANT_ID',
-  'NEXT_PUBLIC_PHONEPE_CLIENT_ID',
-  'NEXT_PUBLIC_PHONEPE_CLIENT_SECRET',
-  'NEXT_PUBLIC_PHONEPE_SALT_KEY',
   'NEXT_PUBLIC_PHONEPE_REDIRECT_URL',
   'NEXT_PUBLIC_PHONEPE_CALLBACK_URL',
 ];
 
-for (const envVar of requiredEnvVars) {
+const requiredPrivateEnvVars = [
+  'PHONEPE_CLIENT_ID',
+  'PHONEPE_CLIENT_SECRET',
+  'PHONEPE_SALT_KEY',
+];
+
+// Only validate private env vars on the server side
+if (typeof window === 'undefined') {
+  for (const envVar of requiredPrivateEnvVars) {
+    if (!process.env[envVar]) {
+      console.error(`Missing required server environment variable: ${envVar}`);
+    }
+  }
+}
+
+// Always validate public env vars
+for (const envVar of requiredPublicEnvVars) {
   if (!process.env[envVar]) {
-    console.error(`Missing required environment variable: ${envVar}`);
+    console.error(`Missing required public environment variable: ${envVar}`);
   }
 } 

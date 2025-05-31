@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
-import { PhonePeService } from '@/lib/phonepe.service';
+import { PhonePeConfig, PhonePeService } from '@/lib/phonepe.service';
 import { config } from '@/lib/config';
 
 // Initialize PhonePe service
-const phonePeService = PhonePeService.getInstance(config.phonepe);
+const phonePeService = PhonePeService.getInstance(config.phonepe as PhonePeConfig);
 
 export async function POST(request: Request) {
   try {
