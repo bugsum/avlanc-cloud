@@ -1,6 +1,13 @@
 import { NextResponse } from 'next/server';
 import { verifyWebhookSignature, processWebhookNotification } from '@/lib/phonepe';
 
+// This route needs to be dynamic as it handles server-side operations
+export const dynamic = 'force-dynamic';
+
+// Disable static generation for this route
+export const revalidate = 0;
+
+
 // Handle OPTIONS method for CORS preflight
 export async function OPTIONS() {
   return new NextResponse(null, {

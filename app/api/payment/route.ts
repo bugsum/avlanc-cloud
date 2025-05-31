@@ -2,6 +2,13 @@ import { NextResponse } from 'next/server';
 import { initiatePhonePePayment, checkPaymentStatus, PaymentRequest, PaymentStatus } from '@/lib/phonepe';
 import { v4 as uuidv4 } from 'uuid';
 
+// This route needs to be dynamic as it handles server-side operations
+export const dynamic = 'force-dynamic';
+
+// Disable static generation for this route
+export const revalidate = 0;
+
+
 // Handle OPTIONS method for CORS preflight
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
